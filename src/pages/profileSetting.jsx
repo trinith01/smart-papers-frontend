@@ -133,44 +133,57 @@ export default function ProfileSettings() {
 
   // Handle preferred followed teacher change
   const handlePreferredFollowedTeacherChange = (e) => {
-    setStudent((prev) => ({
-      ...prev,
-      preferredFollowedTeacher: Number(e.target.value)
-    }));
+    const idx = Number(e.target.value);
+    updateStudent({
+      ...student,
+      preferredFollowedTeacher: idx
+    });
   };
 
   // Save only profile attributes
   const handleSaveProfile = async () => {
     if (!formData) return;
-    const updatedProfile = {};
-    if (formData.name !== student.name) updatedProfile.name = formData.name;
-    if (formData.year !== student.year) updatedProfile.year = formData.year;
-    if (typeof student.preferredFollowedTeacher === 'number') updatedProfile.preferredFollowedTeacher = student.preferredFollowedTeacher;
-    console.log("Updated profile attributes:", updatedProfile);
-    const res = await api.put(`/api/students/${student._id}` ,{name:updatedProfile.name , year:updatedProfile.year , preferredFollowedTeacher:updatedProfile.preferredFollowedTeacher})
-    console.log("res from backend"  , res)
+    const yearNum = Number(formData.year);
+    const minYear = new Date().getFullYear() - 10;
+    const maxYear = new Date().getFullYear() + 5;
+    if (isNaN(yearNum) || yearNum < minYear || yearNum > maxYear) {
+      toast.error(`Year must be between ${minYear} and ${maxYear}`);
+      return;
+    }
+    const updatedProfile = {
+      name: formData.name,
+      year: formData.year,
+      preferredFollowedTeacher: student.preferredFollowedTeacher, // this is a number (index)
+    };
 
-    setStudent({ ...student, ...formData });
-    setIsEditing(false);
-
-    toast("Profile Updated Successfully: Your profile information has been saved.");
+    try {
+      const res = await api.put(`/api/students/${student._id}`, updatedProfile);
+      // Use the response from backend as the new source of truth
+      updateStudent(res.data.data); // updateStudent updates both state and localStorage
+      setIsEditing(false);
+      toast("Profile Updated Successfully: Your profile information has been saved.");
+    } catch (err) {
+      toast.error("Failed to update profile: " + err.message);
+    }
   };
 
   // Save only followed teachers
-  const handleSaveFollowedTeachers =async () => {
+  const handleSaveFollowedTeachers = async () => {
     const followedTeachersForBackend = (student?.followedTeachers || []).map(follow => ({
       teacher: typeof follow.teacher === 'object' ? follow.teacher._id : follow.teacher,
       institute: typeof follow.institute === 'object' ? follow.institute._id : follow.institute,
       category: follow.category
     }));
-    console.log("Updated followedTeachers array for backend:", followedTeachersForBackend);
-    const res = await api.put(`/api/students/${student._id}`, {
-      followedTeachers: followedTeachersForBackend
-    });
-    console.log(res)
 
-
-    toast(res.data);
+    try {
+      const res = await api.put(`/api/students/${student._id}`, {
+        followedTeachers: followedTeachersForBackend
+      });
+      updateStudent(res.data.data); // Use backend response
+      toast("Followed teachers updated successfully.");
+    } catch (err) {
+      toast.error("Failed to update followed teachers: " + err.message);
+    }
   };
 
   const handleCancelEdit = () => {
@@ -255,6 +268,7 @@ export default function ProfileSettings() {
   };
 
   const getInitials = (name) => {
+    if (!name || typeof name !== "string") return "";
     return name
       .split(" ")
       .map((n) => n[0])
@@ -267,6 +281,11 @@ export default function ProfileSettings() {
     setSelectedCategories([]);
     setSearchQuery("");
     setSelectedInstituteForTeacher("");
+  };
+
+  const updateStudent = (newStudent) => {
+    setStudent(newStudent);
+    localStorage.setItem("userData", JSON.stringify(newStudent));
   };
 
   return (
@@ -378,6 +397,7 @@ export default function ProfileSettings() {
                           }
                           placeholder="Enter your full name"
                           className="h-12 bg-white border-slate-200 focus:border-primary focus:ring-primary/20"
+                          disabled={!isEditing}
                         />
                       ) : (
                         <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 h-12 flex items-center text-slate-900">
@@ -399,21 +419,14 @@ export default function ProfileSettings() {
                           id="year"
                           type="number"
                           min={new Date().getFullYear() - 10}
-                          max={new Date().getFullYear()}
+                          max={new Date().getFullYear()+5}
                           value={formData.year}
                           onChange={e => {
-                            const val = e.target.value;
-                            const yearNum = Number(val);
-                            const minYear = new Date().getFullYear() - 10;
-                            const maxYear = new Date().getFullYear();
-                            if (yearNum >= minYear && yearNum <= maxYear) {
-                              setFormData({ ...formData, year: val });
-                            } else if (val === "") {
-                              setFormData({ ...formData, year: "" });
-                            }
+                            setFormData({ ...formData, year: e.target.value });
                           }}
-                          placeholder={`Enter year (${new Date().getFullYear() - 10} - ${new Date().getFullYear()})`}
+                          placeholder={`Enter year (${new Date().getFullYear() - 10} - ${new Date().getFullYear() + 5})`}
                           className="h-12 bg-white border-slate-200 focus:border-primary focus:ring-primary/20"
+                          disabled={!isEditing}
                         />
                       ) : (
                         <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 h-12 flex items-center text-slate-900">
@@ -442,9 +455,10 @@ export default function ProfileSettings() {
                         </Label>
                         <select
                           id="preferredFollowedTeacher"
-                          value={student.preferredFollowedTeacher || 0}
+                          value={typeof student.preferredFollowedTeacher === "number" ? student.preferredFollowedTeacher : 0}
                           onChange={handlePreferredFollowedTeacherChange}
                           className="block w-full mt-1 border rounded p-2"
+                          disabled={!isEditing}
                         >
                           {student.followedTeachers.map((ft, idx) => (
                             <option key={ft.teacher._id} value={idx}>
@@ -494,7 +508,7 @@ export default function ProfileSettings() {
                   <div>
                     <CardTitle className="flex items-center gap-2 text-xl text-slate-900">
                       <Users className="h-5 w-5" />
-                      Followed Teachers ({student.followedTeachers.length})
+                      Followed Teachers ({student.followedTeachers?.length || 0})
                     </CardTitle>
                     <CardDescription className="mt-1 text-slate-600">
                       Manage your followed teachers and discover new ones
@@ -665,7 +679,7 @@ export default function ProfileSettings() {
                                   value={selectedInstituteForTeacher}
                                   onValueChange={setSelectedInstituteForTeacher}
                                 >
-                                  <SelectTrigger className="h-11 bg-white">
+                                  <SelectTrigger className="h-11 bg-white" disabled={!isEditing}>
                                     <SelectValue placeholder="Select an institute" />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -696,6 +710,7 @@ export default function ProfileSettings() {
                                             : [...prev, cat]
                                         )
                                       }
+                                      disabled={!isEditing}
                                     />
                                     <label htmlFor={`category-${cat}`} className="text-sm leading-none cursor-pointer flex-1">
                                       {cat.charAt(0).toUpperCase() + cat.slice(1)}
@@ -736,7 +751,7 @@ export default function ProfileSettings() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {student.followedTeachers.length > 0 ? (
+                  {student.followedTeachers?.length > 0 ? (
                     student.followedTeachers.map((follow, index) => (
                       <div
                         key={index}
@@ -760,7 +775,7 @@ export default function ProfileSettings() {
                                   value={typeof follow.institute === 'object' ? follow.institute._id : follow.institute}
                                   onValueChange={val => handleEditFollowedTeacher(index, 'institute', val)}
                                 >
-                                  <SelectTrigger className="h-8 bg-white border-slate-200">
+                                  <SelectTrigger className="h-8 bg-white border-slate-200" disabled={!isEditing}>
                                     <SelectValue placeholder="Select institute" />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -808,6 +823,7 @@ export default function ProfileSettings() {
                                       : follow.category.filter(c => c !== cat);
                                     handleEditFollowedTeacher(index, 'category', newCats);
                                   }}
+                                  disabled={!isEditing}
                                 />
                                 <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
                                   {cat}

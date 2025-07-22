@@ -207,7 +207,7 @@ export default function Register() {
         await api.post("/api/setUserRole", { uid: user.uid, role: userType })
         toast.success("Account created successfully")
     
-         navigate("/login")
+         navigate("/")
       } catch (error) {
         let errorMsg = error?.message || "Error creating account"
         if (error?.code) {
@@ -606,7 +606,7 @@ export default function Register() {
             <div className="text-center pt-4 border-t border-gray-100">
               <p className="text-sm text-gray-600">
                 Already have an account?{" "}
-                <Link  to = "/login"className="text-blue-600 hover:text-blue-700 font-medium transition-colors hover:underline">
+                <Link  to = "/"className="text-blue-600 hover:text-blue-700 font-medium transition-colors hover:underline">
                   Sign in here
                 </Link>
               </p>

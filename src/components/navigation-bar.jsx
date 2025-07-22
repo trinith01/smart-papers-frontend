@@ -233,14 +233,7 @@ export function NavigationBar() {
                     <span className="text-gray-700">Profile Settings</span>
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild className="p-3 hover:bg-purple-50/80 transition-colors duration-200">
-                  <Link to="/account" className="flex items-center">
-                    <div className="p-1 bg-purple-100 rounded-lg mr-3">
-                      <Settings className="h-4 w-4 text-purple-600" />
-                    </div>
-                    <span className="text-gray-700">Account Settings</span>
-                  </Link>
-                </DropdownMenuItem>
+                
                 <DropdownMenuSeparator className="bg-gray-200/50" />
                 <Dialog open={logoutDialogOpen} onOpenChange={setLogoutDialogOpen}>
                   <DropdownMenuItem
