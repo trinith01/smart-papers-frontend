@@ -161,25 +161,6 @@ export default function CreateMCQPage() {
     initializeQuestions(numCount);
   };
 
-  const uploadImageToImgBB = async (file) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "question_images");
-    formData.append("cloud_name", "dkmvsligs");
-    try {
-      const res = await axios.post(
-        "https://api.cloudinary.com/v1_1/dkmvsligs/image/upload",
-        formData
-      );
-      console.log(res.data.secure_url);
-      return res.data.secure_url;
-    } catch (err) {
-      console.error("ImgBB upload failed:", err);
-      toast.error("Failed to upload image");
-      return null;
-    }
-  };
-
   const updateQuestion = (questionId, field, value) => {
     setQuestions((prev) =>
       prev.map((q) => (q.id === questionId ? { ...q, [field]: value } : q))
@@ -198,10 +179,27 @@ export default function CreateMCQPage() {
         q.id === questionId ? { ...q, [loadingField]: true } : q
       )
     );
-    const imageUrl = await uploadImageToImgBB(file);
-    if (imageUrl) {
+
+    // Convert file to base64
+    const toBase64 = (file) =>
+      new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+      });
+
+    let base64String = null;
+    try {
+      base64String = await toBase64(file);
+    } catch (err) {
+      console.error("Base64 conversion failed:", err);
+      toast.error("Failed to process image");
+    }
+
+    if (base64String) {
       setQuestions((prev) =>
-        prev.map((q) => (q.id === questionId ? { ...q, [field]: imageUrl } : q))
+        prev.map((q) => (q.id === questionId ? { ...q, [field]: base64String } : q))
       );
     }
     // Unset loading state
