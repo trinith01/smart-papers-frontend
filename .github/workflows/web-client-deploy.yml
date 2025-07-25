@@ -1,0 +1,43 @@
+name: Deploy Web Client
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: docker build -t web-client:latest .
+
+      - name: Copy Docker image to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: Dockerfile
+          target: ~/web-client/
+
+      - name: Deploy on EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/web-client
+            docker build -t web-client:latest .
+            docker stop web-client || true
+            docker rm web-client || true
+            docker run -d --name web-client -p 443:443 --restart unless-stopped \
+              -v /etc/ssl/certs:/etc/ssl/certs:ro \
+              -v /etc/ssl/private:/etc/ssl/private:ro \
+              web-client:latest
