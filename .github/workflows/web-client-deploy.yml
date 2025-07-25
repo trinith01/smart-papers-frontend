@@ -34,10 +34,10 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/web-client
-            docker build -t web-client:latest .
-            docker stop web-client || true
-            docker rm web-client || true
-            docker run -d --name web-client -p 443:443 --restart unless-stopped \
+            sudo docker build -t web-client:latest .
+            sudo docker stop web-client || true
+            sudo docker rm web-client || true
+            sudo docker run -d --name web-client -p 443:443 --restart unless-stopped \
               -v /etc/ssl/certs:/etc/ssl/certs:ro \
               -v /etc/ssl/private:/etc/ssl/private:ro \
               web-client:latest
