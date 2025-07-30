@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { BarChart3, FileText, Settings, User, Menu, LogOut, ChevronDown, GraduationCap } from "lucide-react"
+import { BarChart3, FileText, Settings, User, Menu, LogOut, ChevronDown, GraduationCap , PackagePlus , VideoIcon } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
 import { useLocation } from "react-router-dom"
 import { signOut } from "firebase/auth"
@@ -56,6 +56,19 @@ const navItems = [
     icon: User,
     description: "View your personal performance metrics",
   },
+   {
+    title:"Question Bank",
+    href: "/question-bank",
+    icon:PackagePlus,
+    description: "View your personal performance metrics",
+  },
+  {
+    title:"Study Material",
+    href:"/video-upload",
+    icon:VideoIcon,
+    descrition:"add your video"
+
+  }
 ]
 
 // Filter nav items based on role
@@ -77,7 +90,7 @@ export function NavigationBar() {
   // Move filteredNavItems inside the component so it re-computes on role change
   const filteredNavItems = navItems.filter((item) => {
     if (role === "student") {
-      return item.title !== "MCQ Analytics" && item.title !== "Create Paper"
+      return item.title !== "MCQ Analytics" && item.title !== "Create Paper" && item.title !== "Question Bank" && item.title !== "Study Material";
     } else if (role === "teacher") {
       return item.title !== "Quick Anlize" && item.title !== "My performance"
     }

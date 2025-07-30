@@ -204,7 +204,9 @@ export default function Register() {
         console.log("Payload to send:", payload)
         const res = await api.post(endpoint, payload)
       
-        await api.post("/api/setUserRole", { uid: user.uid, role: userType })
+        const  respond = await api.post("/api/setUserRole", { uid: user.uid, role: userType })
+        console.log("User role set response:", respond.data)
+
         toast.success("Account created successfully")
     
          navigate("/")

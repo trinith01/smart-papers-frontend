@@ -408,12 +408,27 @@ export default function StudentResultsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {availableQuizzes.map((quiz) => {
                   const isDone = donePapers.includes(quiz._id)
-                  const isAvailable = isPaperAvailable(quiz)
+                  // Quiz availability logic
+                  let buttonDisabled = false;
+                  let buttonLabel = "Start Quiz";
+                  let now = new Date();
+                  let start = quiz.availability?.[0]?.startTime ? new Date(quiz.availability[0].startTime) : null;
+                  let end = quiz.availability?.[0]?.endTime ? new Date(quiz.availability[0].endTime) : null;
+                  if (isDone) {
+                    buttonDisabled = true;
+                    buttonLabel = "✓ Completed";
+                  } else if (start && now < start) {
+                    buttonDisabled = true;
+                    buttonLabel = "Quiz has not started yet";
+                  } else if (end && now > end) {
+                    buttonDisabled = true;
+                    buttonLabel = "Quiz has ended";
+                  }
                   return (
                     <Card
                       key={quiz._id}
                       className={`transition-all duration-300 bg-white/80 backdrop-blur-sm border-gray-200/50 ${
-                        isDone || !isAvailable
+                        buttonDisabled
                           ? "opacity-50 pointer-events-none"
                           : "hover:shadow-lg hover:scale-105 cursor-pointer"
                       }`}
@@ -453,14 +468,14 @@ export default function StudentResultsPage() {
                         )}
                         <Button
                           className={`w-full mt-4 transition-all duration-300 text-sm ${
-                            !isDone && isAvailable
+                            !buttonDisabled
                               ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg hover:shadow-xl"
                               : "bg-gray-200 text-gray-500"
                           }`}
-                          disabled={isDone || !isAvailable}
-                          asChild={!isDone && isAvailable}
+                          disabled={buttonDisabled}
+                          asChild={!buttonDisabled}
                         >
-                          {!isDone && isAvailable ? (
+                          {!buttonDisabled ? (
                             <Link
                               to="/student-quiz"
                               state={{
@@ -470,13 +485,15 @@ export default function StudentResultsPage() {
                                 timeLimit: Math.round((new Date(quiz.endTime) - new Date(quiz.startTime)) / 60000),
                                 totalQuestions: quiz.questions.length,
                                 subject: quiz.subject,
+                                startTime: quiz.availability?.[0]?.startTime,
+                                endTime: quiz.availability?.[0]?.endTime,
                               }}
                             >
                               <Star className="h-4 w-4 mr-2" />
-                              Start Quiz
+                              {buttonLabel}
                             </Link>
                           ) : (
-                            <span>{isDone ? "✓ Completed" : !isAvailable ? "⏰ Not Available" : "Start Quiz"}</span>
+                            <span>{buttonLabel}</span>
                           )}
                         </Button>
                       </CardContent>

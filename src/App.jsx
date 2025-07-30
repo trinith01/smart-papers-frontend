@@ -12,6 +12,8 @@ import LoginPage from "@/pages/loginPage";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ProfilePage from "./pages/profileSetting";
 import PaperAnalysisDashboard from "./pages/Analytics";
+import VideoUploadPage from "./pages/videoUpload.page";
+import QuestionUploadPage from "./pages/QuestionUploadPage";
 function App() {
   return (
     <BrowserRouter>
@@ -29,6 +31,8 @@ function App() {
             <Route path="/quick-analyze" element={<MCQAnalysisPage />} />
             <Route path="/profile-setting" element={<ProfilePage />} />
             <Route path="/analytics" element={<PaperAnalysisDashboard />} />
+            <Route path="/video-upload" element={<VideoUploadPage />} />
+            <Route path="/question-bank" element={<QuestionUploadPage/>} />
 
             
           </Route>
