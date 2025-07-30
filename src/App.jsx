@@ -12,7 +12,7 @@ import LoginPage from "@/pages/loginPage";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ProfilePage from "./pages/profileSetting";
 import PaperAnalysisDashboard from "./pages/Analytics";
-import VideoUploadPage from "./pages/videoUpload.page";
+import VideoUploadPage from "./pages/VideoUploadPage";
 import QuestionUploadPage from "./pages/QuestionUploadPage";
 function App() {
   return (
