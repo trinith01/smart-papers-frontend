@@ -79,7 +79,7 @@ export default function VideoUploadPage() {
   ]);
   useEffect(() =>{
     const fetchVideos = async () => {
-      const response = await api.get("/api/videos");
+      const response = await api.get(`/api/videos/author/${JSON.parse(localStorage.getItem("userData"))._id}`);
       console.log(response.data);
       setUploadedVideos(response.data);
 

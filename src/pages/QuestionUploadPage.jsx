@@ -177,6 +177,7 @@ export default function QuestionUploadPage() {
     };
 
     const res  = await api.post(`/api/questionBank/${JSON.parse(localStorage.getItem("userData"))._id}` , newQuestion)
+    
     if(res.data.success){
       alert("Question added successfully")
 
@@ -535,7 +536,7 @@ export default function QuestionUploadPage() {
           </CardContent>
         </Card>
 
-        {/* Unit Cards with Statistics */}
+    {/* Unit Cards with Statistics 
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
@@ -577,7 +578,7 @@ export default function QuestionUploadPage() {
                 >
                   <CardContent className="p-6">
                     <div className="space-y-4">
-                      {/* Unit Header */}
+                  
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -595,7 +596,7 @@ export default function QuestionUploadPage() {
                         <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-purple-600 transition-colors" />
                       </div>
 
-                      {/* Statistics */}
+                      
                       <div className="grid grid-cols-3 gap-3">
                         <div className="text-center">
                           <div className="w-full h-12 bg-green-100 rounded-lg flex items-center justify-center mb-2">
@@ -629,7 +630,7 @@ export default function QuestionUploadPage() {
                         </div>
                       </div>
 
-                      {/* View Details Button */}
+                      
                       <div className="pt-2 border-t border-gray-100">
                         <div className="flex items-center justify-center text-sm text-purple-600 font-medium">
                           <span>Click to view questions</span>
@@ -643,6 +644,7 @@ export default function QuestionUploadPage() {
             </div>
           )}
         </div>
+         End of Unit Cards with Statistics */}
       </main>
     </div>
   );
