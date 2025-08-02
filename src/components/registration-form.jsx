@@ -17,13 +17,13 @@ import api from "@/services/api"
 import ReactSelect from "react-select"
 import { useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
-const INSTITUTES = [
-  { name: "Viduna", location: "Galle", _id: "686914bf3700d5d526983c52" },
-  { name: "Vidarsha", location: "Galle", _id: "686914bf3700d5d526983c53" },
-  { name: "Tigma", location: "Galle", _id: "686914bf3700d5d526983c54" },
-  { name: "Dekma", location: "Matara", _id: "686914bf3700d5d526983c55" },
-  { name: "Apeiro", location: "Matara", _id: "686914bf3700d5d526983c56" },
-]
+// const INSTITUTES = [
+//   { name: "Viduna", location: "Galle", _id: "686914bf3700d5d526983c52" },
+//   { name: "Vidarsha", location: "Galle", _id: "686914bf3700d5d526983c53" },
+//   { name: "Tigma", location: "Galle", _id: "686914bf3700d5d526983c54" },
+//   { name: "Dekma", location: "Matara", _id: "686914bf3700d5d526983c55" },
+//   { name: "Apeiro", location: "Matara", _id: "686914bf3700d5d526983c56" },
+// ]
 
 const SUBJECT_OPTIONS = ["Physics", "Chemistry", "Pure-Maths", "Applied Maths", "Biology"]
 
@@ -56,7 +56,21 @@ export default function Register() {
   const [studentFollowedTeachers, setStudentFollowedTeachers] = useState([
     { institute: "", teacher: "", category: [] }
   ])
+  const [INSTITUTES, setINSTITUTES] = useState([])
 
+  useEffect( ()=>{
+    const fetchInstitutes = async () => {
+      try {
+        const response = await api.get("/api/institutes")
+        console.log("Fetched institutes:", response.data)
+        setINSTITUTES(response.data)
+      } catch (error) {
+        console.error("Error fetching institutes:", error)
+      }
+    }
+
+    fetchInstitutes()
+  } , [])
   useEffect(() => {
     const fetchTeachers = async () => {
       setLoadingTeachers(true)

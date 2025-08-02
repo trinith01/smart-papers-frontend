@@ -105,6 +105,7 @@ export default function CreateMCQPage() {
   const [institutes, setInstitutes] = useState([]);
   const [availability, setAvailability] = useState([]);
   const [loggedInUser, setLoggedInUser] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Calculate year range
   const currentYear = new Date().getFullYear();
@@ -232,74 +233,81 @@ export default function CreateMCQPage() {
     setAvailability((prev) => prev.filter((slot) => slot.id !== id));
   };
   const handleSubmit = async () => {
-    if (!paperTitle.trim() || !subject.trim() || !year.trim()) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      if (!paperTitle.trim() || !subject.trim() || !year.trim()) {
+        toast.error("Please fill in all required fields");
+        setIsSubmitting(false);
+        return;
+      }
 
-    // Validate year
-    const yearNum = Number(year);
-    if (isNaN(yearNum) || yearNum < minYear || yearNum > maxYear) {
-      toast.error(`Year must be between ${minYear} and ${maxYear}`);
-      return;
-    }
+      // Validate year
+      const yearNum = Number(year);
+      if (isNaN(yearNum) || yearNum < minYear || yearNum > maxYear) {
+        toast.error(`Year must be between ${minYear} and ${maxYear}`);
+        setIsSubmitting(false);
+        return;
+      }
 
-    if (availability.length === 0) {
-      toast.error("Please add at least one availability slot");
-      return;
-    }
+      if (availability.length === 0) {
+        toast.error("Please add at least one availability slot");
+        setIsSubmitting(false);
+        return;
+      }
 
-    // Check availability slot completeness
-    const invalidSlots = availability.filter(
-      (slot) => !slot.institute || !slot.startTime || !slot.endTime
-    );
-    if (invalidSlots.length > 0) {
-      toast.error("Please complete all availability slots");
-      return;
-    }
+      // Check availability slot completeness
+      const invalidSlots = availability.filter(
+        (slot) => !slot.institute || !slot.startTime || !slot.endTime
+      );
+      if (invalidSlots.length > 0) {
+        toast.error("Please complete all availability slots");
+        setIsSubmitting(false);
+        return;
+      }
 
-    // ✅ Validate each question with Zod
-    const invalidQuestions = questions.filter((q) => {
-      try {
-        QuestionSchema.parse({
+      // ✅ Validate each question with Zod
+      const invalidQuestions = questions.filter((q) => {
+        try {
+          QuestionSchema.parse({
+            questionImage: q.questionImage,
+            answerReviewImage: q.answerReviewImage,
+            correctAnswer: Number(q.correctAnswer),
+            category: q.category,
+          });
+          return false; // valid
+        } catch {
+          return true; // invalid
+        }
+      });
+
+      if (invalidQuestions.length > 0) {
+        toast.error("Please complete all questions before submitting");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Build final payload
+      const paperObject = {
+        title: paperTitle,
+        subject: subject,
+        author: loggedInUser._id,
+        questions: questions.map((q) => ({
           questionImage: q.questionImage,
           answerReviewImage: q.answerReviewImage,
           correctAnswer: Number(q.correctAnswer),
           category: q.category,
-        });
-        return false; // valid
-      } catch {
-        return true; // invalid
-      }
-    });
+          subcategory: q.subcategory || undefined,
+        })),
+        year: year,
+        category: paperCategory,
+        availability: availability.map((slot) => ({
+          institute: slot.institute,
+          startTime: new Date(slot.startTime),
+          endTime: new Date(slot.endTime),
+        })),
+      };
 
-    if (invalidQuestions.length > 0) {
-      toast.error("Please complete all questions before submitting");
-      return;
-    }
-
-    // Build final payload
-    const paperObject = {
-      title: paperTitle,
-      subject: subject,
-      author: loggedInUser._id,
-      questions: questions.map((q) => ({
-        questionImage: q.questionImage,
-        answerReviewImage: q.answerReviewImage,
-        correctAnswer: Number(q.correctAnswer),
-        category: q.category,
-        subcategory: q.subcategory || undefined,
-      })),
-      year: year,
-      category: paperCategory,
-      availability: availability.map((slot) => ({
-        institute: slot.institute,
-        startTime: new Date(slot.startTime),
-        endTime: new Date(slot.endTime),
-      })),
-    };
-
-    try {
       const res = await api.post("/api/papers", paperObject);
       if (res.status === 201) {
         toast.success(res.data.message);
@@ -319,77 +327,11 @@ export default function CreateMCQPage() {
     } catch (error) {
       console.error("Error creating paper:", error);
       toast.error("Failed to create paper");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  // const handleSubmit = async () => {
-  //   if (!paperTitle.trim() || !subject.trim() || !year.trim()) {
-  //     toast.error("Please fill in all required fields")
-  //     return
-  //   }
-
-  //   // Validate year is within allowed range
-  //   const yearNum = Number(year)
-  //   if (isNaN(yearNum) || yearNum < minYear || yearNum > maxYear) {
-  //     toast.error(`Year must be between ${minYear} and ${maxYear}`)
-  //     return
-  //   }
-
-  //   if (availability.length === 0) {
-  //     toast.error("Please add at least one availability slot")
-  //     return
-  //   }
-
-  //   // Validate availability slots
-  //   const invalidSlots = availability.filter((slot) => !slot.institute || !slot.startTime || !slot.endTime)
-  //   if (invalidSlots.length > 0) {
-  //     toast.error("Please complete all availability slots")
-  //     return
-  //   }
-
-  //   // Build the object to send to the server
-  //   const paperObject = {
-  //     title: paperTitle,
-  //     subject: subject,
-  //     author: loggedInUser._id, // Replace with actual teacher name
-  //     questions: questions.map((q) => ({
-  //       questionImage: q.questionImage,
-  //       answerReviewImage: q.answerReviewImage,
-  //       correctAnswer: Number(q.correctAnswer),
-  //       category: q.category,
-  //       subcategory: q.subcategory || undefined,
-  //     })),
-  //     year: year,
-  //     category: paperCategory,
-  //     availability: availability.map((slot) => ({
-  //       institute: slot.institute,
-  //       startTime: new Date(slot.startTime),
-  //       endTime: new Date(slot.endTime),
-  //     })),
-  //   }
-
-  //   try {
-  //     const res = await api.post("/api/papers", paperObject)
-  //     if (res.status === 201) {
-  //       toast.success(res.data.message)
-  //       // Reset form
-  //       setPaperTitle("")
-  //       setSubject("")
-  //       setPaperCategory("theory")
-  //       setYear(new Date().getFullYear().toString())
-  //       setQuestions([])
-  //       setAvailability([])
-  //       // Refresh papers list
-  //       const papersRes = await api.get("/api/papers")
-  //       if (papersRes.status === 200) {
-  //         setPastPapers(papersRes.data.papers)
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error("Error creating paper:", error)
-  //     toast.error("Failed to create paper")
-  //   }
-  // }
 
   const handlePreview = (paper) => {
     setSelectedPaper(paper);
@@ -506,15 +448,16 @@ export default function CreateMCQPage() {
             </Select>
           </div>
 
-          {questions.length === 0 && (
-            <Button
-              onClick={() => initializeQuestions(questionCount)}
-              className="w-full"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Initialize Questions
-            </Button>
-          )}
+      {questions.length === 0 && (
+        <Button
+          onClick={() => initializeQuestions(questionCount)}
+          className="w-full"
+          disabled={isSubmitting}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Initialize Questions
+        </Button>
+      )}
         </CardContent>
       </Card>
 
@@ -583,10 +526,10 @@ export default function CreateMCQPage() {
               </div>
             </Card>
           ))}
-          <Button onClick={addAvailabilitySlot} variant="outline">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Institute Availability
-          </Button>
+      <Button onClick={addAvailabilitySlot} variant="outline" disabled={isSubmitting}>
+        <Plus className="h-4 w-4 mr-2" />
+        Add Institute Availability
+      </Button>
         </CardContent>
       </Card>
 
@@ -807,13 +750,25 @@ export default function CreateMCQPage() {
             </ScrollArea>
             <Separator className="my-6" />
             <div className="flex justify-end space-x-4">
-              <Button variant="outline" onClick={() => setQuestions([])}>
+              <Button variant="outline" onClick={() => setQuestions([])} disabled={isSubmitting}>
                 <Trash2 className="h-4 w-4 mr-2" />
                 Clear All
               </Button>
-              <Button onClick={handleSubmit}>
-                <Save className="h-4 w-4 mr-2" />
-                Submit Paper
+              <Button onClick={handleSubmit} disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                    </svg>
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    Submit Paper
+                  </>
+                )}
               </Button>
             </div>
           </CardContent>

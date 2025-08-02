@@ -173,8 +173,8 @@ export default function StudentResultsPage() {
   const calculateOverallStats = () => {
     const totalQuizzes = results.length
     const averageScore =
-      totalQuizzes > 0 ? results.reduce((sum, result) => sum + result.percentage, 0) / totalQuizzes : 0
-    const bestScore = totalQuizzes > 0 ? Math.max(...results.map((r) => r.percentage)) : 0
+      totalQuizzes > 0 ? results.reduce((sum, result) => sum + result.score, 0) / totalQuizzes : 0
+    const bestScore = totalQuizzes > 0 ? Math.max(...results.map((r) => r.score)) : 0
     const topRanks = results.filter((r) => r.rank <= 3).length
 
     return { totalQuizzes, averageScore, bestScore, topRanks }
@@ -594,8 +594,10 @@ export default function StudentResultsPage() {
                                 <div className="break-words">{result.paperTitle}</div>
                               </TableCell>
                               <TableCell>
-                                <div className="text-gray-600 font-medium">{"dummy score"}</div>
+                                <div className="text-gray-600 font-medium">{result.score}</div>
                               </TableCell>
+                              {/* <TableCell className="text-gray-600">
+                              </TableCell> */}
                               <TableCell className="text-gray-600">
                                 {new Date(result.submittedAt).toLocaleDateString()}
                               </TableCell>
