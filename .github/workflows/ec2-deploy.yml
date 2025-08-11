@@ -22,9 +22,6 @@ jobs:
         env:
           EC2_USER: ${{ secrets.EC2_USER }}
           EC2_HOST: ${{ secrets.EC2_HOST }}
-          VIRTUAL_HOST: ${{ secrets.VIRTUAL_HOST }}
-          LETSENCRYPT_HOST: ${{ secrets.LETSENCRYPT_HOST }}
-          LETSENCRYPT_EMAIL: ${{ secrets.LETSENCRYPT_EMAIL }}
         run: |
           ssh -o BatchMode=yes -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
             set -xe
@@ -49,8 +46,8 @@ jobs:
               --restart unless-stopped \
               --env-file .env \
               --network proxy-net \
-              -e VIRTUAL_HOST=$VIRTUAL_HOST \
-              -e LETSENCRYPT_HOST=$LETSENCRYPT_HOST \
-              -e LETSENCRYPT_EMAIL=$LETSENCRYPT_EMAIL \
+              -e VIRTUAL_HOST=${{ secrets.VIRTUAL_HOST }} \
+              -e LETSENCRYPT_HOST=${{ secrets.LETSENCRYPT_HOST }} \
+              -e LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }} \
               ghcr.io/${{ github.repository }}:main
           EOF
