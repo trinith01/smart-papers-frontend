@@ -22,6 +22,7 @@ import {
 import { Link } from "react-router-dom"
 import api from "@/services/api"
 import { toast } from "sonner"
+import MarksComparisonChart from "@/components/marks-comparison"
 
 export default function StudentResultsPage() {
   const [followedTeachers, setFollowedTeachers] = useState([])
@@ -33,6 +34,7 @@ export default function StudentResultsPage() {
   const [userData, setUserData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [loggedInUser, setLoggedInUser] = useState(null)
+  const [graphData, setGraphData] = useState([])
 
   useEffect(() => {
     const storedUser = localStorage.getItem("userData")
@@ -66,12 +68,27 @@ export default function StudentResultsPage() {
     getResults()
   }, [loggedInUser])
 
+  useEffect(() => {
+    const getAveragedScores = async () => {
+      try {
+        const res = await api.get(`/api/submissions/scoresWithAverages/${loggedInUser?._id}`)
+        console.log("Averaged scores response:", res.data)
+        setGraphData(res.data)
+      } catch (error) {
+        console.error("Error fetching averaged scores:", error)
+      }
+    }
+    if (loggedInUser && loggedInUser._id) {
+      getAveragedScores()
+    }
+  }, [loggedInUser])
+
   const getDonePapers = async () => {
     if (!loggedInUser || !loggedInUser._id) return
 
     try {
       console.log("logged in user  form get done papers", loggedInUser)
-      const res = await api.get(`/api/submissions/done/${loggedInUser._id}`)
+      const res = await api.get(`/api/submissions/done/${loggedInUser?._id}`)
       console.log("Done papers response:", res)
       if (res.status === 200) {
         console.log("Done papers response:", res.data)
@@ -350,6 +367,9 @@ export default function StudentResultsPage() {
             </CardContent>
           </Card>
         </div>
+        <>
+          <MarksComparisonChart data ={graphData} />
+        </>
 
         {/* Available New Quizzes */}
         <Card className="bg-white/70 backdrop-blur-sm border-gray-200/50 shadow-xl">
@@ -409,20 +429,20 @@ export default function StudentResultsPage() {
                 {availableQuizzes.map((quiz) => {
                   const isDone = donePapers.includes(quiz._id)
                   // Quiz availability logic
-                  let buttonDisabled = false;
-                  let buttonLabel = "Start Quiz";
-                  let now = new Date();
-                  let start = quiz.availability?.[0]?.startTime ? new Date(quiz.availability[0].startTime) : null;
-                  let end = quiz.availability?.[0]?.endTime ? new Date(quiz.availability[0].endTime) : null;
+                  let buttonDisabled = false
+                  let buttonLabel = "Start Quiz"
+                  let now = new Date()
+                  let start = quiz.availability?.[0]?.startTime ? new Date(quiz.availability[0].startTime) : null
+                  let end = quiz.availability?.[0]?.endTime ? new Date(quiz.availability[0].endTime) : null
                   if (isDone) {
-                    buttonDisabled = true;
-                    buttonLabel = "✓ Completed";
+                    buttonDisabled = true
+                    buttonLabel = "✓ Completed"
                   } else if (start && now < start) {
-                    buttonDisabled = true;
-                    buttonLabel = "Quiz has not started yet";
+                    buttonDisabled = true
+                    buttonLabel = "Quiz has not started yet"
                   } else if (end && now > end) {
-                    buttonDisabled = true;
-                    buttonLabel = "Quiz has ended";
+                    buttonDisabled = true
+                    buttonLabel = "Quiz has ended"
                   }
                   return (
                     <Card
@@ -582,6 +602,7 @@ export default function StudentResultsPage() {
                           <TableRow className="bg-gradient-to-r from-gray-50/80 to-gray-100/80">
                             <TableHead className="font-semibold text-gray-700">Quiz Title</TableHead>
                             <TableHead className="font-semibold text-gray-700">Score</TableHead>
+                            <TableHead className="font-semibold text-gray-700">Rank</TableHead>
                             <TableHead className="font-semibold text-gray-700">Date</TableHead>
                             <TableHead className="font-semibold text-gray-700">Status</TableHead>
                             <TableHead className="font-semibold text-gray-700">Actions</TableHead>
@@ -596,8 +617,10 @@ export default function StudentResultsPage() {
                               <TableCell>
                                 <div className="text-gray-600 font-medium">{result.score}</div>
                               </TableCell>
-                              {/* <TableCell className="text-gray-600">
-                              </TableCell> */}
+                              <TableCell>
+                                <div className="text-gray-600 font-medium">{ getRankBadge(result.rank)}</div>
+                              </TableCell>
+                      
                               <TableCell className="text-gray-600">
                                 {new Date(result.submittedAt).toLocaleDateString()}
                               </TableCell>

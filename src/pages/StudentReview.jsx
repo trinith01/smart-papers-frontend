@@ -68,10 +68,10 @@ export default function StudentReviewPage({ params }) {
           </CardHeader>
           <CardContent>
             <div className={`text-xl sm:text-2xl font-bold ${getScoreColor(review.score, review.answers.length)}`}>
-              {review.score}/{review.answers.length}
+              {review.score}%
             </div>
             <p className="text-xs text-muted-foreground">
-              {((review.score / review.answers.length) * 100).toFixed(1)}% correct
+              {`${Math.round((review.score / 100) * review.answers.length)} is correct out of ${review.answers.length}`}
             </p>
           </CardContent>
         </Card>

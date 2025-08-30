@@ -1,12 +1,23 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { BarChart3, FileText, Settings, User, Menu, LogOut, ChevronDown, GraduationCap , PackagePlus , VideoIcon } from "lucide-react"
-import { Link, useNavigate } from "react-router-dom"
-import { useLocation } from "react-router-dom"
-import { signOut } from "firebase/auth"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react";
+import {
+  BarChart3,
+  FileText,
+  Settings,
+  User,
+  Menu,
+  LogOut,
+  ChevronDown,
+  GraduationCap,
+  PackagePlus,
+  VideoIcon,
+} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { signOut } from "firebase/auth";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,11 +25,18 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
-import { auth } from "./firabase"
+} from "@/components/ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { auth } from "./firabase";
 import {
   Dialog,
   DialogContent,
@@ -27,8 +45,8 @@ import {
   DialogTitle,
   DialogClose,
   DialogDescription,
-} from "@/components/ui/dialog"
-import api from "@/services/api"
+} from "@/components/ui/dialog";
+import api from "@/services/api";
 
 // Navigation items
 const navItems = [
@@ -56,20 +74,19 @@ const navItems = [
     icon: User,
     description: "View your personal performance metrics",
   },
-   {
-    title:"Question Bank",
+  {
+    title: "Question Bank",
     href: "/question-bank",
-    icon:PackagePlus,
+    icon: PackagePlus,
     description: "View your personal performance metrics",
   },
   {
-    title:"Study Material",
-    href:"/video-upload",
-    icon:VideoIcon,
-    descrition:"add your video"
-
-  }
-]
+    title: "Study Material",
+    href: "/video-upload",
+    icon: VideoIcon,
+    descrition: "add your video",
+  },
+];
 
 // Filter nav items based on role
 const user = {
@@ -77,85 +94,108 @@ const user = {
   email: "john.doe@example.com",
   avatar: "/placeholder.svg?height=32&width=32",
   role: "Administrator",
-}
+};
 
 export function NavigationBar() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false)
-  const [userData, setUserData] = useState(user) // Replace with actual user data fetching logic
-  const [role, setRole] = useState(() => localStorage.getItem("userRole") || "student") // Assuming role is part of userData
-  const location = useLocation()
-  const navigate = useNavigate()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+  const [userData, setUserData] = useState(user); // Replace with actual user data fetching logic
+  const [role, setRole] = useState(
+    () => localStorage.getItem("userRole") || "student"
+  ); // Assuming role is part of userData
+  const location = useLocation();
+  const navigate = useNavigate();
 
   // Move filteredNavItems inside the component so it re-computes on role change
   const filteredNavItems = navItems.filter((item) => {
     if (role === "student") {
-      return item.title !== "MCQ Analytics" && item.title !== "Create Paper" && item.title !== "Question Bank" && item.title !== "Study Material";
+      return (
+        item.title !== "MCQ Analytics" &&
+        item.title !== "Create Paper" &&
+        item.title !== "Question Bank" &&
+        item.title !== "Study Material"
+      );
     } else if (role === "teacher") {
-      return item.title !== "Quick Anlize" && item.title !== "My performance"
+      return item.title !== "Quick Anlize" && item.title !== "My performance";
     }
-    return true
-  })
+    return true;
+  });
 
-  const isActive = (href) => location.pathname === href
+  const isActive = (href) => location.pathname === href;
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const loggedInUser = JSON.parse(localStorage.getItem("userData")) || {}
-      console.log("Logged in user data from nav bar:", loggedInUser)
-      setUserData(loggedInUser)
-      const uuid = auth.currentUser?.uid
+      const loggedInUser = JSON.parse(localStorage.getItem("userData")) || {};
+      console.log("Logged in user data from nav bar:", loggedInUser);
+      setUserData(loggedInUser);
+      const uuid = auth.currentUser?.uid;
       if (uuid) {
         try {
           // Get the user's role from Firebase custom claims
-          const idTokenResult = await auth.currentUser.getIdTokenResult()
-          const userRole = localStorage.getItem("userRole") || idTokenResult.claims.role || "student" // Default to "student" if no role found
-          console.log("role from localStorage or Firebase:", userRole)
-          setRole(userRole)
-          console.log("User role:", userRole)
-          console.log("User role:", userRole)
-          let res
+          const idTokenResult = await auth.currentUser.getIdTokenResult();
+          const userRole =
+            localStorage.getItem("userRole") ||
+            idTokenResult.claims.role ||
+            "student"; // Default to "student" if no role found
+          console.log("role from localStorage or Firebase:", userRole);
+          setRole(userRole);
+          console.log("User role:", userRole);
+          console.log("User role:", userRole);
+          let res;
           if (role === "student") {
-            res = await api.get(`/api/students/${uuid}`)
+            res = await api.get(`/api/students/${uuid}`);
           } else if (role === "teacher") {
-            res = await api.get(`/api/teachers/${uuid}`)
+            res = await api.get(`/api/teachers/${uuid}`);
           } else {
             // fallback or handle unknown role
-            res = { data: { name: "Unknown", email: auth.currentUser.email, role: role || "Unknown" } }
+            res = {
+              data: {
+                name: "Unknown",
+                email: auth.currentUser.email,
+                role: role || "Unknown",
+              },
+            };
           }
-          setUserData(res.data)
+          setUserData(res.data);
         } catch (error) {
-          console.error("Failed to fetch user data:", error)
+          console.error("Failed to fetch user data:", error);
         }
       }
-    }
-    fetchUserData()
-  }, [])
+    };
+    fetchUserData();
+  }, []);
 
   const handleLogout = async () => {
-    await signOut(auth)
-    setLogoutDialogOpen(false)
-    localStorage.removeItem("userData") // Clear user data from localStorage
-    localStorage.removeItem("userRole") // Clear user role from localStorage
-    
-    navigate("/")
-  }
+    await signOut(auth);
+    setLogoutDialogOpen(false);
+    localStorage.removeItem("userData"); // Clear user data from localStorage
+    localStorage.removeItem("userRole"); // Clear user role from localStorage
+
+    navigate("/");
+  };
 
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b border-gray-200/50 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60 shadow-sm">
         <div className="container flex h-16 items-center">
           {/* Logo */}
-          <div className="mr-8 ml-0">
+      
+          <div className="mr-10 ml-2">
+            {" "}
+            {/* increased margin */}
             <Link to="/" className="flex items-center space-x-3 group">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl blur-lg opacity-20 group-hover:opacity-30 transition-opacity"></div>
-                <div className="relative bg-gradient-to-r from-blue-500 to-purple-600 p-2 rounded-xl shadow-lg">
-                  <GraduationCap className="w-5 h-5 text-white" />
+                <div className="absolute rounded-xl blur-lg opacity-25 group-hover:opacity-40 transition-opacity"></div>
+                <div className="relative p-1 rounded-xl shadow-lg">
+                  <img
+                    src="https://viduna.lk/wp-content/uploads/2022/05/logo-120x82.png"
+                    alt="Viduna Logo"
+                    className="w-12 h-12 object-contain drop-shadow-md" // bigger + shadow
+                  />
                 </div>
               </div>
-              <span className="hidden font-bold sm:inline-block text-xl bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                QuizMaster AI
+              <span className="hidden font-bold sm:inline-block text-2xl bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                Viduna
               </span>
             </Link>
           </div>
@@ -170,7 +210,7 @@ export function NavigationBar() {
                   "flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 relative group",
                   isActive(item.href)
                     ? "text-blue-600 bg-blue-50/80 backdrop-blur-sm shadow-sm"
-                    : "text-gray-600 hover:text-blue-600 hover:bg-blue-50/50",
+                    : "text-gray-600 hover:text-blue-600 hover:bg-blue-50/50"
                 )}
               >
                 <item.icon className="size-4" />
@@ -201,8 +241,12 @@ export function NavigationBar() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="hidden md:flex md:flex-col md:items-start md:ml-3">
-                    <span className="text-sm font-medium text-gray-800">{userData.name}</span>
-                    <span className="text-xs text-gray-500 capitalize">{role}</span>
+                    <span className="text-sm font-medium text-gray-800">
+                      {userData.name}
+                    </span>
+                    <span className="text-xs text-gray-500 capitalize">
+                      {role}
+                    </span>
                   </div>
                   <ChevronDown className="hidden md:block ml-2 h-4 w-4 text-gray-400" />
                 </Button>
@@ -225,8 +269,12 @@ export function NavigationBar() {
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="text-sm font-medium leading-none text-gray-800">{userData.name}</p>
-                        <p className="text-xs leading-none text-gray-500 mt-1">{userData.email}</p>
+                        <p className="text-sm font-medium leading-none text-gray-800">
+                          {userData.name}
+                        </p>
+                        <p className="text-xs leading-none text-gray-500 mt-1">
+                          {userData.email}
+                        </p>
                         <Badge
                           variant="outline"
                           className="mt-2 text-xs bg-blue-50 text-blue-700 border-blue-200 capitalize"
@@ -238,7 +286,10 @@ export function NavigationBar() {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-gray-200/50" />
-                <DropdownMenuItem asChild className="p-3 hover:bg-blue-50/80 transition-colors duration-200">
+                <DropdownMenuItem
+                  asChild
+                  className="p-3 hover:bg-blue-50/80 transition-colors duration-200"
+                >
                   <Link to="/profile-setting" className="flex items-center">
                     <div className="p-1 bg-blue-100 rounded-lg mr-3">
                       <User className="h-4 w-4 text-blue-600" />
@@ -246,9 +297,12 @@ export function NavigationBar() {
                     <span className="text-gray-700">Profile Settings</span>
                   </Link>
                 </DropdownMenuItem>
-                
+
                 <DropdownMenuSeparator className="bg-gray-200/50" />
-                <Dialog open={logoutDialogOpen} onOpenChange={setLogoutDialogOpen}>
+                <Dialog
+                  open={logoutDialogOpen}
+                  onOpenChange={setLogoutDialogOpen}
+                >
                   <DropdownMenuItem
                     className="text-red-600 p-3 hover:bg-red-50/80 transition-colors duration-200"
                     onClick={() => setLogoutDialogOpen(true)}
@@ -267,12 +321,16 @@ export function NavigationBar() {
                         Confirm Logout
                       </DialogTitle>
                       <DialogDescription className="text-gray-600">
-                        Are you sure you want to log out? You'll need to sign in again to access your account.
+                        Are you sure you want to log out? You'll need to sign in
+                        again to access your account.
                       </DialogDescription>
                     </DialogHeader>
                     <DialogFooter className="gap-2">
                       <DialogClose asChild>
-                        <Button variant="outline" className="bg-white/80 hover:bg-gray-50">
+                        <Button
+                          variant="outline"
+                          className="bg-white/80 hover:bg-gray-50"
+                        >
                           Cancel
                         </Button>
                       </DialogClose>
@@ -312,7 +370,9 @@ export function NavigationBar() {
                     </div>
                     Navigation Menu
                   </SheetTitle>
-                  <SheetDescription className="text-gray-600">Access all QuizMaster AI features</SheetDescription>
+                  <SheetDescription className="text-gray-600">
+                    Access all QuizMaster AI features
+                  </SheetDescription>
                 </SheetHeader>
 
                 {/* User Info in Mobile */}
@@ -328,7 +388,9 @@ export function NavigationBar() {
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="text-sm font-medium text-gray-800">{userData.name}</p>
+                      <p className="text-sm font-medium text-gray-800">
+                        {userData.name}
+                      </p>
                       <p className="text-xs text-gray-500">{userData.email}</p>
                       <Badge
                         variant="outline"
@@ -350,15 +412,29 @@ export function NavigationBar() {
                         "flex items-center space-x-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300",
                         isActive(item.href)
                           ? "bg-blue-50/80 text-blue-600 shadow-sm"
-                          : "text-gray-600 hover:bg-blue-50/50 hover:text-blue-600",
+                          : "text-gray-600 hover:bg-blue-50/50 hover:text-blue-600"
                       )}
                     >
-                      <div className={cn("p-2 rounded-lg", isActive(item.href) ? "bg-blue-100" : "bg-gray-100")}>
-                        <item.icon className={cn("size-4", isActive(item.href) ? "text-blue-600" : "text-gray-500")} />
+                      <div
+                        className={cn(
+                          "p-2 rounded-lg",
+                          isActive(item.href) ? "bg-blue-100" : "bg-gray-100"
+                        )}
+                      >
+                        <item.icon
+                          className={cn(
+                            "size-4",
+                            isActive(item.href)
+                              ? "text-blue-600"
+                              : "text-gray-500"
+                          )}
+                        />
                       </div>
                       <div className="flex flex-col items-start">
                         <span>{item.title}</span>
-                        <span className="text-xs text-gray-500">{item.description}</span>
+                        <span className="text-xs text-gray-500">
+                          {item.description}
+                        </span>
                       </div>
                     </Link>
                   ))}
@@ -404,12 +480,16 @@ export function NavigationBar() {
               Confirm Logout
             </DialogTitle>
             <DialogDescription className="text-gray-600">
-              Are you sure you want to log out? You'll need to sign in again to access your account.
+              Are you sure you want to log out? You'll need to sign in again to
+              access your account.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
             <DialogClose asChild>
-              <Button variant="outline" className="bg-white/80 hover:bg-gray-50">
+              <Button
+                variant="outline"
+                className="bg-white/80 hover:bg-gray-50"
+              >
                 Cancel
               </Button>
             </DialogClose>
@@ -424,5 +504,5 @@ export function NavigationBar() {
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }

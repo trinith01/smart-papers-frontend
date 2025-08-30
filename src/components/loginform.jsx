@@ -66,7 +66,7 @@ export function LoginForm({ className, ...props }) {
         setError("Failed to retrieve user data.")
         toast.error("Failed to retrieve user data.")
       }
-      
+
       // or role-based navigation
     } catch (err) {
       console.error(err)
@@ -79,30 +79,26 @@ export function LoginForm({ className, ...props }) {
 
   return (
     <div className="relative">
-      {/* Elegant Glassmorphism Container */}
-      <div className="relative backdrop-blur-xl bg-white/70 border border-gray-200/50 rounded-3xl p-8 shadow-xl">
-        {/* Subtle Glow Effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 via-purple-50/50 to-indigo-50/50 rounded-3xl blur-xl"></div>
+      <div className="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-8 shadow-xl">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-indigo-500/10 rounded-3xl blur-xl"></div>
 
         <div className="relative z-10 space-y-6">
-          {/* Elegant Header */}
           <div className="text-center space-y-3">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <Sparkles className="w-5 h-5 text-blue-500 animate-pulse" />
-              <h1 className="text-2xl font-bold text-gray-900">Login to your account</h1>
-              <Sparkles className="w-5 h-5 text-purple-500 animate-pulse" />
+      
+              <h1 className="text-2xl font-bold text-white">Login to your account</h1>
+           
             </div>
-            <p className="text-gray-600">Enter your email below to login to your account</p>
+            <p className="text-gray-300">Enter your email below to login to your account</p>
           </div>
 
           <form className={cn("space-y-6", className)} {...props} onSubmit={handleSubmit}>
-            {/* Email Field */}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="email" className="text-sm font-medium text-gray-200">
                 Email
               </Label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 group-focus-within:text-blue-500 transition-colors duration-300" />
+                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 group-focus-within:text-blue-400 transition-colors duration-300" />
                 <Input
                   id="email"
                   type="email"
@@ -110,59 +106,55 @@ export function LoginForm({ className, ...props }) {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-12 h-12 bg-white/80 border-gray-300/50 text-gray-900 placeholder:text-gray-500 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 rounded-xl"
+                  className="pl-12 h-12 bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-blue-400 focus:bg-white/20 focus:ring-2 focus:ring-blue-400/20 transition-all duration-300 rounded-xl"
                 />
               </div>
             </div>
 
-            {/* Password Field */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="password" className="text-sm font-medium text-gray-200">
                   Password
                 </Label>
                 <a
                   href="#"
-                  className="text-sm text-blue-600 hover:text-blue-500 transition-colors duration-300 underline-offset-4 hover:underline"
+                  className="text-sm text-blue-400 hover:text-blue-300 transition-colors duration-300 underline-offset-4 hover:underline"
                 >
                   Forgot your password?
                 </a>
               </div>
               <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 group-focus-within:text-blue-500 transition-colors duration-300" />
+                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 group-focus-within:text-blue-400 transition-colors duration-300" />
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-12 pr-12 h-12 bg-white/80 border-gray-300/50 text-gray-900 placeholder:text-gray-500 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 rounded-xl"
+                  className="pl-12 pr-12 h-12 bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-blue-400 focus:bg-white/20 focus:ring-2 focus:ring-blue-400/20 transition-all duration-300 rounded-xl"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-300"
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors duration-300"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>
 
-            {/* Error Message */}
             {error && (
-              <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm text-center">
+              <div className="p-3 rounded-xl bg-red-500/20 border border-red-400/30 text-red-300 text-sm text-center">
                 {error}
               </div>
             )}
 
-            {/* Submit Button */}
             <Button
               type="submit"
-              className="w-full h-12 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-500 hover:via-purple-500 hover:to-indigo-500 text-white font-semibold rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-blue-500/25 group relative overflow-hidden"
+              className="w-full h-12 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-white/25 group relative overflow-hidden border border-white/30"
               disabled={loading}
             >
-              {/* Button Glow Effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300 rounded-xl"></div>
+              <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
 
               {loading ? (
                 <div className="flex items-center gap-2">
@@ -193,13 +185,12 @@ export function LoginForm({ className, ...props }) {
             </Button>
           </form>
 
-          {/* Sign Up Link */}
           <div className="text-center pt-4">
-            <p className="text-gray-600">
+            <p className="text-gray-300">
               Don't have an account?{" "}
               <Link
                 to="/register"
-                className="text-blue-600 hover:text-blue-500 font-medium transition-colors duration-300 underline underline-offset-4"
+                className="text-blue-400 hover:text-blue-300 font-medium transition-colors duration-300 underline underline-offset-4"
               >
                 Sign up
               </Link>
