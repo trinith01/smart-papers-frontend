@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -53,6 +53,8 @@ import axios from "axios";
 import api from "@/services/api";
 import { z } from "zod";
 
+import { GlobalContext } from "@/context/globalState";
+
 const QuestionSchema = z.object({
   questionImage: z.string().url(),
   answerReviewImage: z.string().url(),
@@ -60,12 +62,7 @@ const QuestionSchema = z.object({
   category: z.string().min(1),
 });
 
-const subjectOptions = [
-  { value: "Physics", label: "Physics" },
-  { value: "Mathematics", label: "Mathematics" },
-  { value: "History", label: "History" },
-  { value: "General", label: "General" },
-];
+const subjectOptions = [{ value: "Physics", label: "Physics" }];
 
 const categoryOptions = {
   Physics: [
@@ -106,6 +103,9 @@ export default function CreateMCQPage() {
   const [availability, setAvailability] = useState([]);
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+ 
+
+  const { units } = useContext(GlobalContext);
 
   // Calculate year range
   const currentYear = new Date().getFullYear();
@@ -200,7 +200,9 @@ export default function CreateMCQPage() {
 
     if (base64String) {
       setQuestions((prev) =>
-        prev.map((q) => (q.id === questionId ? { ...q, [field]: base64String } : q))
+        prev.map((q) =>
+          q.id === questionId ? { ...q, [field]: base64String } : q
+        )
       );
     }
     // Unset loading state
@@ -332,7 +334,6 @@ export default function CreateMCQPage() {
     }
   };
 
-
   const handlePreview = (paper) => {
     setSelectedPaper(paper);
     setIsPreviewOpen(true);
@@ -448,16 +449,16 @@ export default function CreateMCQPage() {
             </Select>
           </div>
 
-      {questions.length === 0 && (
-        <Button
-          onClick={() => initializeQuestions(questionCount)}
-          className="w-full"
-          disabled={isSubmitting}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Initialize Questions
-        </Button>
-      )}
+          {questions.length === 0 && (
+            <Button
+              onClick={() => initializeQuestions(questionCount)}
+              className="w-full"
+              disabled={isSubmitting}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Initialize Questions
+            </Button>
+          )}
         </CardContent>
       </Card>
 
@@ -526,10 +527,14 @@ export default function CreateMCQPage() {
               </div>
             </Card>
           ))}
-      <Button onClick={addAvailabilitySlot} variant="outline" disabled={isSubmitting}>
-        <Plus className="h-4 w-4 mr-2" />
-        Add Institute Availability
-      </Button>
+          <Button
+            onClick={addAvailabilitySlot}
+            variant="outline"
+            disabled={isSubmitting}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Institute Availability
+          </Button>
         </CardContent>
       </Card>
 
@@ -667,7 +672,7 @@ export default function CreateMCQPage() {
 
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-2">
-                          <Label className="text-sm font-medium">
+                          {/* <Label className="text-sm font-medium">
                             Category
                           </Label>
                           <Select
@@ -688,25 +693,97 @@ export default function CreateMCQPage() {
                                 )
                               )}
                             </SelectContent>
-                          </Select>
+                          </Select> */}
+                          <div className="space-y-4">
+                            {/* Category & Subcategory per Question */}
+                            <div className="space-y-4">
+                              {/* Category */}
+                              <div>
+                                <Label className="text-sm font-medium">
+                                  Category
+                                </Label>
+                                <Select
+                                  value={question.category || ""}
+                                  onValueChange={(value) => {
+                                    updateQuestion(
+                                      question.id,
+                                      "category",
+                                      value
+                                    );
+                                    updateQuestion(
+                                      question.id,
+                                      "subcategory",
+                                      ""
+                                    ); // reset subcategory
+                                  }}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select category" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {units.map((unit) => (
+                                      <SelectItem
+                                        key={unit._id}
+                                        value={unit.value}
+                                      >
+                                        {unit.label}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+
+                              {/* Subcategory */}
+                              {question.category && (
+                                <div>
+                                  <Label className="text-sm font-medium">
+                                    Subcategory
+                                  </Label>
+                                  <Select
+                                    value={question.subcategory || ""}
+                                    onValueChange={(value) =>
+                                      updateQuestion(
+                                        question.id,
+                                        "subcategory",
+                                        value
+                                      )
+                                    }
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select subcategory" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {(
+                                        units.find(
+                                          (u) => u.value === question.category
+                                        )?.subunits || []
+                                      ).length > 0 ? (
+                                        units
+                                          .find(
+                                            (u) => u.value === question.category
+                                          )
+                                          .subunits.map((sub) => (
+                                            <SelectItem
+                                              key={sub._id}
+                                              value={sub.value}
+                                            >
+                                              {sub.label}
+                                            </SelectItem>
+                                          ))
+                                      ) : (
+                                        <SelectItem disabled>
+                                          No subcategories
+                                        </SelectItem>
+                                      )}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         </div>
 
-                        <div className="space-y-2">
-                          <Label className="text-sm font-medium">
-                            Subcategory (Optional)
-                          </Label>
-                          <Input
-                            placeholder="Enter subcategory"
-                            value={question.subcategory}
-                            onChange={(e) =>
-                              updateQuestion(
-                                question.id,
-                                "subcategory",
-                                e.target.value
-                              )
-                            }
-                          />
-                        </div>
+                        
 
                         <div className="space-y-3">
                           <Label className="text-sm font-medium">
@@ -750,16 +827,36 @@ export default function CreateMCQPage() {
             </ScrollArea>
             <Separator className="my-6" />
             <div className="flex justify-end space-x-4">
-              <Button variant="outline" onClick={() => setQuestions([])} disabled={isSubmitting}>
+              <Button
+                variant="outline"
+                onClick={() => setQuestions([])}
+                disabled={isSubmitting}
+              >
                 <Trash2 className="h-4 w-4 mr-2" />
                 Clear All
               </Button>
               <Button onClick={handleSubmit} disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
-                    <svg className="animate-spin h-4 w-4 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                    <svg
+                      className="animate-spin h-4 w-4 mr-2 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v8z"
+                      ></path>
                     </svg>
                     Submitting...
                   </>

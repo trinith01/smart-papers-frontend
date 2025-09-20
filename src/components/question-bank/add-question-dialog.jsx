@@ -1,16 +1,31 @@
-"use client"
+"use client";
 
-
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Upload, ImageIcon, Layers, BarChart3, BookOpen, FileImage } from "lucide-react"
-
-
-
+import { useContext, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Upload,
+  ImageIcon,
+  Layers,
+  BarChart3,
+  BookOpen,
+  FileImage,
+} from "lucide-react";
+import { GlobalContext } from "@/context/globalState";
 
 export function AddQuestionDialog({ selectedBank, onSubmit, onClose }) {
   const [formData, setFormData] = useState({
@@ -22,40 +37,39 @@ export function AddQuestionDialog({ selectedBank, onSubmit, onClose }) {
     subunitName: "",
     bankName: selectedBank?.name || "",
     bankId: selectedBank?._id || "",
-   
-  })
+  });
 
-  const [questionImagePreview, setQuestionImagePreview] = useState("")
-  const [answerImagePreview, setAnswerImagePreview] = useState("")
+  const [questionImagePreview, setQuestionImagePreview] = useState("");
+  const [answerImagePreview, setAnswerImagePreview] = useState("");
 
   const handleQuestionImageChange = (e) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onload = (e) => {
-        const result = e.target?.result 
-        setQuestionImagePreview(result)
-        setFormData((prev) => ({ ...prev, questionImage: result }))
-      }
-      reader.readAsDataURL(file)
+        const result = e.target?.result;
+        setQuestionImagePreview(result);
+        setFormData((prev) => ({ ...prev, questionImage: result }));
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   const handleAnswerImageChange = (e) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onload = (e) => {
-        const result = e.target?.result
-        setAnswerImagePreview(result)
-        setFormData((prev) => ({ ...prev, answerImage: result }))
-      }
-      reader.readAsDataURL(file)
+        const result = e.target?.result;
+        setAnswerImagePreview(result);
+        setFormData((prev) => ({ ...prev, answerImage: result }));
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (
       !formData.questionImage ||
@@ -66,20 +80,20 @@ export function AddQuestionDialog({ selectedBank, onSubmit, onClose }) {
       !formData.subunitName ||
       !formData.bankName
     ) {
-      alert("Please fill in all fields and upload both images")
-      return
+      alert("Please fill in all fields and upload both images");
+      return;
     }
 
     // TODO: Replace with actual API call
-    
+
     // const response = await fetch('/api/questions', {
     //   method: 'POST',
     //   headers: { 'Content-Type': 'application/json' },
     //   body: JSON.stringify({ ...formData, bankId: selectedBank?._id })
     // })
 
-    onSubmit(formData)
-    onClose()
+    onSubmit(formData);
+    onClose();
 
     // Reset form
     setFormData({
@@ -91,22 +105,26 @@ export function AddQuestionDialog({ selectedBank, onSubmit, onClose }) {
       subunitName: "",
       bankName: "",
       bankId: "",
-    })
-    setQuestionImagePreview("")
-    setAnswerImagePreview("")
-  }
+    });
+    setQuestionImagePreview("");
+    setAnswerImagePreview("");
+  };
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
-    }))
-  }
-
+    }));
+  };
+ const{units} = useContext(GlobalContext)
   return (
     <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
       <DialogHeader>
-        <DialogTitle>{selectedBank ? `Add Question to ${selectedBank.name}` : "Upload New Question"}</DialogTitle>
+        <DialogTitle>
+          {selectedBank
+            ? `Add Question to ${selectedBank.name}`
+            : "Upload New Question"}
+        </DialogTitle>
         <DialogDescription>
           {selectedBank
             ? `Add a new question to the selected question bank`
@@ -117,7 +135,10 @@ export function AddQuestionDialog({ selectedBank, onSubmit, onClose }) {
       <form onSubmit={handleSubmit} className="space-y-8 p-1">
         {/* Bank Name Field */}
         <div className="space-y-3">
-          <Label htmlFor="bankName" className="text-sm font-medium text-gray-700">
+          <Label
+            htmlFor="bankName"
+            className="text-sm font-medium text-gray-700"
+          >
             Question Bank Name
           </Label>
           <Input
@@ -128,7 +149,11 @@ export function AddQuestionDialog({ selectedBank, onSubmit, onClose }) {
             className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
             disabled={!!selectedBank}
           />
-          {selectedBank && <p className="text-sm text-gray-500">This question will be added to the selected bank</p>}
+          {selectedBank && (
+            <p className="text-sm text-gray-500">
+              This question will be added to the selected bank
+            </p>
+          )}
         </div>
 
         <div className="space-y-6">
@@ -156,9 +181,12 @@ export function AddQuestionDialog({ selectedBank, onSubmit, onClose }) {
                         type="button"
                         className="absolute top-2 right-2 z-10 bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-full shadow-lg transition-colors"
                         onClick={(e) => {
-                          e.stopPropagation()
-                          setQuestionImagePreview("")
-                          setFormData((prev) => ({ ...prev, questionImage: "" }))
+                          e.stopPropagation();
+                          setQuestionImagePreview("");
+                          setFormData((prev) => ({
+                            ...prev,
+                            questionImage: "",
+                          }));
                         }}
                       >
                         Remove
@@ -168,11 +196,15 @@ export function AddQuestionDialog({ selectedBank, onSubmit, onClose }) {
                     <div className="flex flex-col items-center justify-center py-8">
                       <FileImage className="w-12 h-12 mb-4 text-gray-400" />
                       <p className="text-sm text-gray-600 text-center">
-                        <span className="font-semibold text-purple-600">Click to upload</span>
+                        <span className="font-semibold text-purple-600">
+                          Click to upload
+                        </span>
                         <br />
                         question image
                       </p>
-                      <p className="text-xs text-gray-500 mt-2">PNG, JPG up to 10MB</p>
+                      <p className="text-xs text-gray-500 mt-2">
+                        PNG, JPG up to 10MB
+                      </p>
                     </div>
                   )}
                   <input
@@ -209,9 +241,9 @@ export function AddQuestionDialog({ selectedBank, onSubmit, onClose }) {
                         type="button"
                         className="absolute top-2 right-2 z-10 bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-full shadow-lg transition-colors"
                         onClick={(e) => {
-                          e.stopPropagation()
-                          setAnswerImagePreview("")
-                          setFormData((prev) => ({ ...prev, answerImage: "" }))
+                          e.stopPropagation();
+                          setAnswerImagePreview("");
+                          setFormData((prev) => ({ ...prev, answerImage: "" }));
                         }}
                       >
                         Remove
@@ -221,11 +253,15 @@ export function AddQuestionDialog({ selectedBank, onSubmit, onClose }) {
                     <div className="flex flex-col items-center justify-center py-8">
                       <FileImage className="w-12 h-12 mb-4 text-gray-400" />
                       <p className="text-sm text-gray-600 text-center">
-                        <span className="font-semibold text-purple-600">Click to upload</span>
+                        <span className="font-semibold text-purple-600">
+                          Click to upload
+                        </span>
                         <br />
                         answer image
                       </p>
-                      <p className="text-xs text-gray-500 mt-2">PNG, JPG up to 10MB</p>
+                      <p className="text-xs text-gray-500 mt-2">
+                        PNG, JPG up to 10MB
+                      </p>
                     </div>
                   )}
                   <input
@@ -243,14 +279,22 @@ export function AddQuestionDialog({ selectedBank, onSubmit, onClose }) {
         </div>
 
         <div className="space-y-6">
-          <h3 className="text-lg font-medium text-gray-900">Question Details</h3>
+          <h3 className="text-lg font-medium text-gray-900">
+            Question Details
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-3">
-              <Label htmlFor="category" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <Label
+                htmlFor="category"
+                className="text-sm font-medium text-gray-700 flex items-center gap-2"
+              >
                 <Layers className="w-4 h-4 text-purple-600" />
                 Category
               </Label>
-              <Select value={formData.category} onValueChange={(value) => handleInputChange("category", value)}>
+              <Select
+                value={formData.category}
+                onValueChange={(value) => handleInputChange("category", value)}
+              >
                 <SelectTrigger className="border-gray-300 focus:border-purple-500 focus:ring-purple-500">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
@@ -263,11 +307,19 @@ export function AddQuestionDialog({ selectedBank, onSubmit, onClose }) {
             </div>
 
             <div className="space-y-3">
-              <Label htmlFor="difficulty" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <Label
+                htmlFor="difficulty"
+                className="text-sm font-medium text-gray-700 flex items-center gap-2"
+              >
                 <BarChart3 className="w-4 h-4 text-purple-600" />
                 Difficulty
               </Label>
-              <Select value={formData.difficulty} onValueChange={(value) => handleInputChange("difficulty", value)}>
+              <Select
+                value={formData.difficulty}
+                onValueChange={(value) =>
+                  handleInputChange("difficulty", value)
+                }
+              >
                 <SelectTrigger className="border-gray-300 focus:border-purple-500 focus:ring-purple-500">
                   <SelectValue placeholder="Select difficulty" />
                 </SelectTrigger>
@@ -280,36 +332,69 @@ export function AddQuestionDialog({ selectedBank, onSubmit, onClose }) {
             </div>
 
             <div className="space-y-3">
-              <Label htmlFor="unitName" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <Label
+                htmlFor="unitName"
+                className="text-sm font-medium text-gray-700 flex items-center gap-2"
+              >
                 <BookOpen className="w-4 h-4 text-purple-600" />
                 Unit Name
               </Label>
-              <Select value={formData.unitName} onValueChange={(value) => handleInputChange("unitName", value)}>
+              <Select
+                value={formData.unitName}
+                onValueChange={(value) => {
+                  handleInputChange("unitName", value);
+                  handleInputChange("subunitName", ""); // reset subunit when unit changes
+                }}
+              >
                 <SelectTrigger className="border-gray-300 focus:border-purple-500 focus:ring-purple-500">
                   <SelectValue placeholder="Select a unit" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Array.from({ length: 10 }, (_, i) => (
-                    <SelectItem key={i} value={`Unit ${i + 1}`}>
-                      Unit {i + 1}
+                  {units.map((unit) => (
+                    <SelectItem key={unit._id} value={unit.value}>
+                      {unit.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
+            {/* Subunit Dropdown */}
             <div className="space-y-3">
-              <Label htmlFor="subunitName" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <Label
+                htmlFor="subunitName"
+                className="text-sm font-medium text-gray-700 flex items-center gap-2"
+              >
                 <BookOpen className="w-4 h-4 text-purple-600" />
                 SubUnit Name
               </Label>
-              <Input
-                id="subunitName"
+              <Select
                 value={formData.subunitName}
-                onChange={(e) => handleInputChange("subunitName", e.target.value)}
-                placeholder="Enter subunit name"
-                className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
-              />
+                onValueChange={(value) =>
+                  handleInputChange("subunitName", value)
+                }
+                disabled={!formData.unitName}
+              >
+                <SelectTrigger className="border-gray-300 focus:border-purple-500 focus:ring-purple-500">
+                  <SelectValue placeholder="Select a subunit" />
+                </SelectTrigger>
+                <SelectContent>
+                  {(
+                    units.find((u) => u.value === formData.unitName)
+                      ?.subunits || []
+                  ).length > 0 ? (
+                    units
+                      .find((u) => u.value === formData.unitName)
+                      .subunits.map((sub) => (
+                        <SelectItem key={sub._id} value={sub.value}>
+                          {sub.label}
+                        </SelectItem>
+                      ))
+                  ) : (
+                    <SelectItem disabled>No subunits</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
@@ -325,5 +410,5 @@ export function AddQuestionDialog({ selectedBank, onSubmit, onClose }) {
         </div>
       </form>
     </DialogContent>
-  )
+  );
 }

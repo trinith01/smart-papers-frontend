@@ -14,6 +14,9 @@ import ProfilePage from "./pages/profileSetting";
 import PaperAnalysisDashboard from "./pages/Analytics";
 import VideoUploadPage from "./pages/VideoUploadPage";
 import QuestionUploadPage from "./pages/QuestionUploadPage";
+import TeacherUnitManager from "./pages/TeacherUnitManager";
+
+
 function App() {
   return (
     <BrowserRouter>
@@ -33,6 +36,7 @@ function App() {
             <Route path="/analytics" element={<PaperAnalysisDashboard />} />
             <Route path="/video-upload" element={<VideoUploadPage />} />
             <Route path="/question-bank" element={<QuestionUploadPage/>} />
+            <Route path="/unit-management" element={<TeacherUnitManager />} />
 
             
           </Route>

@@ -100,17 +100,7 @@ export default function QuestionBankPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50">
-      {/* <Header
-        selectedBank={selectedBank}
-        isUploadDialogOpen={isUploadDialogOpen}
-        setIsUploadDialogOpen={setIsUploadDialogOpen}
-      >
-        <AddQuestionDialog
-          selectedBank={selectedBank}
-          onSubmit={handleSubmitQuestion}
-          onClose={() => setIsUploadDialogOpen(false)}
-        />
-      </Header> */}
+     
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">

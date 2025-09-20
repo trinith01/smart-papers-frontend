@@ -179,7 +179,7 @@ export function NavigationBar() {
       <header className="sticky top-0 z-50 w-full border-b border-gray-200/50 bg-white/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60 shadow-sm">
         <div className="container flex h-16 items-center">
           {/* Logo */}
-      
+
           <div className="mr-10 ml-2">
             {" "}
             {/* increased margin */}
@@ -296,7 +296,20 @@ export function NavigationBar() {
                     </div>
                     <span className="text-gray-700">Profile Settings</span>
                   </Link>
+                 
                 </DropdownMenuItem>
+                
+                   {role === "teacher" && (
+                    <DropdownMenuItem>
+                    <Link to="/unit-management" className="flex items-center">
+                      <div className="p-1 bg-blue-100 rounded-lg mr-3">
+                        <User className="h-4 w-4 text-blue-600" />
+                      </div>
+                      <span className="text-gray-700">Unit Settings</span>
+                    </Link>
+                    </DropdownMenuItem>
+                  )}
+                
 
                 <DropdownMenuSeparator className="bg-gray-200/50" />
                 <Dialog
