@@ -3,6 +3,7 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
+import { getImageUrl } from "@/lib/utils"
 
 export default function ReviewDialog({ 
   isOpen, 
@@ -26,7 +27,7 @@ export default function ReviewDialog({
                 <h3 className="font-semibold mb-3 text-base sm:text-lg">Question:</h3>
                 <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
                   <img
-                    src={selectedQuestion.question.questionImage || "/placeholder.svg"}
+                    src={getImageUrl(selectedQuestion.question.questionImage) || "/placeholder.svg"}
                     alt={`Question`}
                     className="max-w-full max-h-full object-contain rounded"
                   />
@@ -38,7 +39,7 @@ export default function ReviewDialog({
                 <h3 className="font-semibold mb-3 text-base sm:text-lg">Solution Method:</h3>
                 <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
                   <img
-                    src={selectedQuestion.question.answerReviewImage || "/placeholder.svg"}
+                    src={getImageUrl(selectedQuestion.question.answerReviewImage) || "/placeholder.svg"}
                     alt={`Solution for Question`}
                     className="max-w-full max-h-full object-contain rounded"
                   />

@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { FileText, Trash2, Save, ImageIcon } from "lucide-react"
+import { getImageUrl } from "@/lib/utils"
 
 export default function QuestionEditor({
   questions,
@@ -88,7 +89,7 @@ export default function QuestionEditor({
                           <div className="mt-2">
                             <img
                               src={
-                                question.questionImage || "/placeholder.svg"
+                                getImageUrl(question.questionImage) || "/placeholder.svg"
                               }
                               alt="Question"
                               className="max-w-full h-32 object-contain rounded border"
@@ -131,7 +132,7 @@ export default function QuestionEditor({
                           <div className="mt-2">
                             <img
                               src={
-                                question.answerReviewImage ||
+                                getImageUrl(question.answerReviewImage) ||
                                 "/placeholder.svg"
                               }
                               alt="Answer Review"

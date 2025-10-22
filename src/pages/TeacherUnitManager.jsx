@@ -19,8 +19,6 @@ export default function TeacherUnitManager() {
   const [editValues, setEditValues] = useState({})
   const [newSubunitInputs, setNewSubunitInputs] = useState({})
 
-  const API_BASE = "http://localhost:5000/teacher-units"
-
   // ---------- HANDLERS ----------
 
   const handleNewUnitChange = (field, value) => setNewUnit({ ...newUnit, [field]: value })

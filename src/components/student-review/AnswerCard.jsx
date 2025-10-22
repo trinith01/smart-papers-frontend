@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle, XCircle, Eye } from "lucide-react"
+import { getImageUrl } from "@/lib/utils"
 
 export default function AnswerCard({ 
   answer, 
@@ -28,7 +29,7 @@ export default function AnswerCard({
       <CardContent className="space-y-3">
         <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
           <img
-            src={answer.question.questionImage || "/placeholder.svg"}
+            src={getImageUrl(answer.question.questionImage) || "/placeholder.svg"}
             alt={`Question ${index + 1}`}
             className="max-w-full max-h-full object-contain rounded"
           />
