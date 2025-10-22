@@ -2,7 +2,7 @@
 
 import { useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
-import api from "@/services/api";
+import api, { uploadImage } from "@/services/api";
 import { z } from "zod";
 import { GlobalContext } from "@/context/globalState";
 
@@ -14,8 +14,8 @@ import PastPapersTable from "@/components/create-paper/PastPapersTable";
 import PreviewDialog from "@/components/create-paper/PreviewDialog";
 
 const QuestionSchema = z.object({
-  questionImage: z.string().url(),
-  answerReviewImage: z.string().url(),
+  questionImage: z.string().min(1, "Question image is required"),
+  answerReviewImage: z.string().min(1, "Answer review image is required"),
   correctAnswer: z.union([z.number(), z.string().regex(/^\d$/)]),
   category: z.string().min(1),
 });
@@ -148,18 +148,23 @@ export default function CreateMCQPage() {
         reader.onerror = (error) => reject(error);
       });
 
-    let base64String = null;
+    let imageId = null;
     try {
-      base64String = await toBase64(file);
+      const base64String = await toBase64(file);
+      
+      // Upload image to server and get ID
+      imageId = await uploadImage(base64String, 'questions');
+      
+      toast.success('Image uploaded successfully');
     } catch (err) {
-      console.error("Base64 conversion failed:", err);
-      toast.error("Failed to process image");
+      console.error("Image upload failed:", err);
+      toast.error("Failed to upload image");
     }
 
-    if (base64String) {
+    if (imageId) {
       setQuestions((prev) =>
         prev.map((q) =>
-          q.id === questionId ? { ...q, [field]: base64String } : q
+          q.id === questionId ? { ...q, [field]: imageId } : q
         )
       );
     }

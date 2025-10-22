@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Label } from "@/components/ui/label"
 import { FileText } from "lucide-react"
+import { getImageUrl } from "@/lib/utils"
 
 export default function PreviewDialog({ 
   isPreviewOpen, 
@@ -90,7 +91,7 @@ export default function PreviewDialog({
                             Question Image
                           </Label>
                           <img
-                            src={q.questionImage || "/placeholder.svg"}
+                            src={getImageUrl(q.questionImage) || "/placeholder.svg"}
                             alt={`Question ${idx + 1}`}
                             className="w-full max-w-xs rounded border my-2"
                           />
@@ -100,7 +101,7 @@ export default function PreviewDialog({
                             Answer Review Image
                           </Label>
                           <img
-                            src={q.answerReviewImage || "/placeholder.svg"}
+                            src={getImageUrl(q.answerReviewImage) || "/placeholder.svg"}
                             alt={`Answer Review ${idx + 1}`}
                             className="w-full max-w-xs rounded border my-2"
                           />

@@ -11,6 +11,7 @@ import { Clock, CheckCircle, ImageIcon, AlertCircle } from "lucide-react"
 import { toast } from "sonner"
 import { useLocation } from "react-router-dom"
 import api from "@/services/api"
+import { getImageUrl } from "@/lib/utils"
 
 const answerOptions = ["1", "2", "3", "4", "5"]
 const answerLabels = ["1", "2", "3", "4", "5"]
@@ -425,7 +426,7 @@ export default function StudentQuizPage() {
                           {question.questionImage ? (
                             <div className="relative group">
                               <img
-                                src={question.questionImage || "/placeholder.svg"}
+                                src={getImageUrl(question.questionImage) || "/placeholder.svg"}
                                 alt={`Question ${questionNumber}`}
                                 className="w-full h-auto max-h-80 object-contain rounded-lg border-2 border-gray-200 shadow-md group-hover:shadow-lg transition-shadow duration-200"
                               />
