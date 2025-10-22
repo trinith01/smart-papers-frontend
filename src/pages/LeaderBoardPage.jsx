@@ -377,8 +377,11 @@ export default function LeaderBoardPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="bg-gradient-to-r from-slate-800 to-slate-700 text-white">
-                      <th className="px-6 py-4 text-left font-semibold">Question Number</th>
-                      <th className="px-6 py-4 text-center font-semibold">Incorrect Answers</th>
+                      <th className="px-6 py-4 text-left font-semibold">Question</th>
+                      <th className="px-6 py-4 text-left font-semibold">Category</th>
+                      <th className="px-6 py-4 text-center font-semibold">Correct Answer</th>
+                      <th className="px-6 py-4 text-center font-semibold">Incorrect Count</th>
+                      <th className="px-6 py-4 text-center font-semibold">Images</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white">
@@ -388,12 +391,45 @@ export default function LeaderBoardPage() {
                         className="border-b border-slate-100 hover:bg-red-50 transition-colors"
                       >
                         <td className="px-6 py-4">
-                          <div className="font-semibold text-slate-800">Question {question.questionIndex + 1}</div>
+                          <div className="font-semibold text-slate-800 text-lg">
+                            Q{question.questionIndex?.questionIndex + 1 || index + 1}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="space-y-1">
+                            <Badge className="bg-blue-100 text-blue-800 border-0 font-medium">
+                              {question.questionIndex?.category || 'N/A'}
+                            </Badge>
+                            {question.questionIndex?.subcategory && (
+                              <div className="text-sm text-slate-600 font-medium">
+                                {question.questionIndex.subcategory}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <Badge className="bg-green-100 text-green-800 border-0 font-semibold text-base px-3 py-1">
+                            Option {(question.questionIndex?.correctAnswer ?? 0) + 1}
+                          </Badge>
                         </td>
                         <td className="px-6 py-4 text-center">
                           <Badge className="bg-red-100 text-red-700 hover:bg-red-200 border-0 font-semibold text-base px-4 py-2">
                             {question.totalIncorrect}
                           </Badge>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <div className="flex gap-2 justify-center">
+                            {question.questionIndex?.questionImage && (
+                              <Badge className="bg-purple-100 text-purple-700 border-0 text-xs px-2 py-1">
+                                Question
+                              </Badge>
+                            )}
+                            {question.questionIndex?.answerReviewImage && (
+                              <Badge className="bg-orange-100 text-orange-700 border-0 text-xs px-2 py-1">
+                                Answer
+                              </Badge>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}
