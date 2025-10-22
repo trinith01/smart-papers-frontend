@@ -115,6 +115,7 @@ export default function StudentResultsPage() {
         alert("Preferred teacher or institute is missing. Please reload.")
         return
       }
+      console.log("Fetching available quizzes for teacherId:", teacherId, "instituteId:", instituteId, "category:", selectedCategory, "year:", loggedInUser.year)
 
       const res = await api.get(
         `/api/papers/available?teacherId=${teacherId}&category=${selectedCategory}&year=${loggedInUser.year}&instituteId=${instituteId}`,
@@ -150,7 +151,7 @@ export default function StudentResultsPage() {
 
   const getPreferredTeacherId = () => {
     const preferred = getPreferredFollowedTeacher()
-    // console.log("preferred teacher id", preferred);
+    console.log("preferred teacher id", preferred);
     return preferred?.teacher?._id
   }
 

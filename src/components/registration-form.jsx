@@ -638,6 +638,35 @@ export default function Register() {
                     </Select>
                     {errors.subjects && <p className="text-sm text-red-500">{errors.subjects}</p>}
                   </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="institute" className="text-sm font-medium text-gray-700">
+                      Institutes (Select multiple)
+                    </Label>
+                    <ReactSelect
+                      isMulti
+                      name="institute"
+                      options={INSTITUTES.map(inst => ({
+                        value: inst._id,
+                        label: `${inst.name} (${inst.location})`
+                      }))}
+                      value={INSTITUTES.filter(inst => 
+                        formData.institute && 
+                        Array.isArray(formData.institute) && 
+                        formData.institute.includes(inst._id)
+                      ).map(inst => ({
+                        value: inst._id,
+                        label: `${inst.name} (${inst.location})`
+                      }))}
+                      onChange={(selected) => 
+                        handleInputChange("institute", selected ? selected.map(opt => opt.value) : [])
+                      }
+                      classNamePrefix="react-select"
+                      placeholder="Select institutes where you teach..."
+                      className={errors.institute ? "border-red-500" : ""}
+                    />
+                    {errors.institute && <p className="text-sm text-red-500">{errors.institute}</p>}
+                  </div>
                 </TabsContent>
 
                 {/* Submit Button */}
