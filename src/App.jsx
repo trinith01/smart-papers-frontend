@@ -15,7 +15,7 @@ import PaperAnalysisDashboard from "./pages/Analytics";
 import VideoUploadPage from "./pages/VideoUploadPage";
 import QuestionUploadPage from "./pages/QuestionUploadPage";
 import TeacherUnitManager from "./pages/TeacherUnitManager";
-
+import LeaderBoardPage from "./pages/LeaderboardPage";
 
 function App() {
   return (
@@ -37,6 +37,7 @@ function App() {
             <Route path="/video-upload" element={<VideoUploadPage />} />
             <Route path="/question-bank" element={<QuestionUploadPage/>} />
             <Route path="/unit-management" element={<TeacherUnitManager />} />
+            <Route path="/papers/:paperId" element={<LeaderBoardPage />} />
 
             
           </Route>

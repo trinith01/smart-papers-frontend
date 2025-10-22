@@ -1,0 +1,90 @@
+📊 STUDENT PERFORMANCE COMPONENT STRUCTURE
+═══════════════════════════════════════════════════════════════════
+
+StudentPerformance (Main Container)
+│
+├─ 🔄 LoadingState
+│  └─ Purpose: Shows loading spinner during data fetch
+│
+├─ 📋 PageHeader
+│  └─ Purpose: Page title and navigation header
+│
+├─ 👨‍🏫 TeacherCategorySelector
+│  ├─ Props:
+│  │  ├─ preferredTeacher: string (selected teacher preference)
+│  │  ├─ availableCategories: array (available subject categories)
+│  │  ├─ selectedCategory: string (currently selected category)
+│  │  └─ onCategorySelect: function (category selection handler)
+│  ├─ Purpose: Filter performance data by teacher and category
+│  ├─ Features:
+│  │  ├─ Teacher dropdown selection
+│  │  ├─ Category filter buttons
+│  │  ├─ Clear filters option
+│  │  └─ Filter state persistence
+│  └─ Integration: Updates parent component filters
+│
+├─ 📈 OverallStats
+│  ├─ Props:
+│  │  ├─ stats: object (overall performance statistics)
+│  │  └─ followedTeachersCount: number (number of followed teachers)
+│  ├─ Purpose: Display high-level performance metrics
+│  ├─ Features:
+│  │  ├─ Total quizzes taken
+│  │  ├─ Average score
+│  │  ├─ Best performance
+│  │  ├─ Improvement trends
+│  │  └─ Followed teachers count
+│  └─ Integration: Receives data from performance API
+│
+├─ 📊 MarksComparisonChart
+│  ├─ Props:
+│  │  └─ data: array (performance data for charting)
+│  ├─ Purpose: Visual representation of performance trends
+│  ├─ Features:
+│  │  ├─ Line chart showing score progression
+│  │  ├─ Interactive data points
+│  │  ├─ Zoom and pan functionality
+│  │  ├─ Export chart as image
+│  │  └─ Responsive design
+│  └─ Integration: Uses charting library (e.g., Chart.js, Recharts)
+│
+├─ 🎯 AvailableQuizzes
+│  ├─ Props:
+│  │  ├─ availableQuizzes: array (list of available quizzes)
+│  │  ├─ donePapers: array (list of completed papers)
+│  │  ├─ selectedCategory: string (filtered category)
+│  │  ├─ preferredTeacher: string (filtered teacher)
+│  │  └─ loading: boolean (loading state)
+│  ├─ Purpose: Display and manage available quizzes
+│  ├─ Features:
+│  │  ├─ Quiz cards with details
+│  │  ├─ Start quiz functionality
+│  │  ├─ Progress indicators
+│  │  ├─ Filter by completion status
+│  │  ├─ Search and sort options
+│  │  └─ Pagination
+│  └─ Integration: Connects to quiz management system
+│
+└─ 📚 QuizResultsHistory
+   ├─ Props:
+   │  ├─ results: array (historical quiz results)
+   │  └─ selectedCategory: string (filtered category)
+   ├─ Purpose: Display historical performance data
+   ├─ Features:
+   │  ├─ Results table with sorting
+   │  ├─ Detailed result views
+   │  ├─ Export results functionality
+   │  ├─ Performance comparison
+   │  ├─ Date range filtering
+   │  └─ Download certificates
+   └─ Integration: Retrieves data from results API
+
+═══════════════════════════════════════════════════════════════════
+📝 COMPONENT FLOW:
+1. StudentPerformance loads → LoadingState shown
+2. Data fetched → PageHeader + TeacherCategorySelector + OverallStats displayed
+3. User selects filters → MarksComparisonChart + AvailableQuizzes + QuizResultsHistory update
+4. User starts quiz → AvailableQuizzes handles quiz initiation
+5. Quiz completed → QuizResultsHistory updates with new result
+6. Performance data changes → All components reflect updated statistics
+═══════════════════════════════════════════════════════════════════

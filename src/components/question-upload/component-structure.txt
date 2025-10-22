@@ -1,0 +1,79 @@
+📤 QUESTION UPLOAD COMPONENT STRUCTURE
+═══════════════════════════════════════════════════════════════════
+
+QuestionUploadPage (Main Container)
+│
+├─ 📋 PageHeader
+│  ├─ Props:
+│  │  └─ (none - static header content)
+│  └─ Purpose: Page title and navigation header
+│
+└─ 📝 UploadForm
+   ├─ Props:
+   │  └─ onSubmit: function (form submission handler)
+   │
+   └─ Components:
+      │
+      ├─ 🖼️ ImageUploadField (Question Image)
+      │  ├─ Props:
+      │  │  ├─ id: string (unique field identifier)
+      │  │  ├─ label: string (field label text)
+      │  │  ├─ preview: string (image preview URL)
+      │  │  ├─ onImageChange: function (image change handler)
+      │  │  ├─ onImageRemove: function (image removal handler)
+      │  │  └─ required: boolean (field requirement flag)
+      │  ├─ Purpose: Upload and manage question images
+      │  ├─ Features:
+      │  │  ├─ Drag & drop image upload
+      │  │  ├─ Image preview
+      │  │  ├─ Image validation (size, format)
+      │  │  ├─ Remove image option
+      │  │  └─ Progress indicator
+      │  └─ Integration: Connects to image storage service
+      │
+      ├─ 🖼️ ImageUploadField (Answer Image)
+      │  ├─ Props:
+      │  │  ├─ id: string (unique field identifier)
+      │  │  ├─ label: string (field label text)
+      │  │  ├─ preview: string (image preview URL)
+      │  │  ├─ onImageChange: function (image change handler)
+      │  │  ├─ onImageRemove: function (image removal handler)
+      │  │  └─ required: boolean (field requirement flag)
+      │  ├─ Purpose: Upload and manage answer images
+      │  ├─ Features:
+      │  │  ├─ Drag & drop image upload
+      │  │  ├─ Image preview
+      │  │  ├─ Image validation (size, format)
+      │  │  ├─ Remove image option
+      │  │  └─ Progress indicator
+      │  └─ Integration: Connects to image storage service
+      │
+      └─ 📋 FormFields
+         ├─ Props:
+         │  ├─ formData: object (form data state)
+         │  └─ onInputChange: function (input change handler)
+         ├─ Purpose: Text-based form fields for question data
+         ├─ Fields:
+         │  ├─ Question text input
+         │  ├─ Option A, B, C, D inputs
+         │  ├─ Correct answer selection
+         │  ├─ Subject/Category selection
+         │  ├─ Difficulty level
+         │  └─ Unit/Topic assignment
+         ├─ Features:
+         │  ├─ Form validation
+         │  ├─ Auto-save functionality
+         │  ├─ Rich text editor
+         │  └─ Dynamic option management
+         └─ Integration: Manages form state and validation
+
+═══════════════════════════════════════════════════════════════════
+📝 COMPONENT FLOW:
+1. QuestionUploadPage loads → PageHeader + UploadForm
+2. UploadForm renders → ImageUploadField (Question) + ImageUploadField (Answer) + FormFields
+3. User uploads question image → ImageUploadField handles upload and preview
+4. User uploads answer image → ImageUploadField handles upload and preview
+5. User fills form data → FormFields manages text inputs and selections
+6. User submits form → onSubmit callback processes all data
+7. Form validation → Success/error feedback provided
+═══════════════════════════════════════════════════════════════════

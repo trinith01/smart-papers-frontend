@@ -1,0 +1,52 @@
+📊 MCQ ANALYZE COMPONENT STRUCTURE
+═══════════════════════════════════════════════════════════════════
+
+McqAnalyze (Main Container)
+│
+├─ 🔄 LoadingState
+│  └─ Purpose: Shows loading spinner during data fetch
+│
+├─ ❌ ErrorState
+│  ├─ Props:
+│  │  ├─ error: string (error message to display)
+│  │  └─ onRetry: function (callback to retry failed operation)
+│  └─ Purpose: Displays error message with retry option
+│
+├─ 📋 MainHeader
+│  └─ Purpose: Page title and main navigation
+│
+├─ 📈 OverallStats
+│  ├─ Props:
+│  │  └─ analysisData: object (overall performance statistics)
+│  └─ Purpose: Shows high-level performance metrics
+│
+├─ 📊 PerformanceGraphs
+│  ├─ Props:
+│  │  └─ unitSummaries: array (performance data per unit)
+│  └─ Purpose: Visual charts of performance trends
+│
+├─ 🎯 UnitPerformanceCards
+│  ├─ Props:
+│  │  ├─ unitSummaries: array (unit performance data)
+│  │  └─ onUnitClick: function (callback when unit card is clicked)
+│  └─ Purpose: Grid of clickable unit performance cards
+│
+└─ 🔍 UnitDetailsView (Conditional - shown when unit selected)
+   ├─ Props:
+   │  ├─ selectedUnit: object (currently selected unit data)
+   │  ├─ selectedUnitData: object (detailed unit statistics)
+   │  ├─ unitQuestions: array (questions within selected unit)
+   │  ├─ onBackToUnits: function (callback to return to unit list)
+   │  ├─ onReviewQuestion: function (callback to review specific question)
+   │  ├─ isReviewDialogOpen: boolean (review dialog visibility state)
+   │  ├─ setIsReviewDialogOpen: function (review dialog state setter)
+   │  └─ selectedQuestion: object (question being reviewed)
+   └─ Purpose: Detailed view of selected unit with question analysis
+
+═══════════════════════════════════════════════════════════════════
+📝 COMPONENT FLOW:
+1. McqAnalyze loads → LoadingState shown
+2. Data fetched → ErrorState OR MainHeader + OverallStats + PerformanceGraphs + UnitPerformanceCards
+3. Unit card clicked → UnitDetailsView displayed
+4. Question review → ReviewDialog opens
+═══════════════════════════════════════════════════════════════════

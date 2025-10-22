@@ -5,6 +5,8 @@ import { TypingAnimation } from "@/components/magicui/typing-animation"
 import { HyperText } from "@/components/magicui/hyper-text"
 import image from "@/assets/sujith-sir-cover-photo.png"
 import { LoginForm } from "@/components/loginform"
+import PageHeader from "@/components/login-page/PageHeader"
+import FeatureCards from "@/components/login-page/FeatureCards"
 
 export default function LandingPage() {
   const handleLogin = () => {
@@ -29,23 +31,7 @@ export default function LandingPage() {
           {/* Modern Bento Grid Container */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
             {/* Header Logo - Spans full width on mobile, partial on desktop */}
-            <div className="lg:col-span-12 mb-4 lg:mb-0">
-              <div className="flex items-center gap-3 sm:gap-4 group justify-center lg:justify-start">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 rounded-2xl blur-lg opacity-30 group-hover:opacity-50 transition-all duration-500"></div>
-                  <div className="relative p-2 sm:p-3 rounded-2xl shadow-xl bg-white/15 backdrop-blur-md border border-white/20">
-                    <img
-                      src="https://viduna.lk/wp-content/uploads/2022/05/logo-120x82.png"
-                      alt="Viduna Logo"
-                      className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 object-contain"
-                    />
-                  </div>
-                </div>
-                <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold bg-gradient-to-r from-blue-300 via-purple-300 to-indigo-300 bg-clip-text text-transparent">
-                  Viduna
-                </h1>
-              </div>
-            </div>
+            <PageHeader />
 
             {/* Hero Text Section - Large card */}
             <div className="lg:col-span-5 relative">
@@ -71,65 +57,7 @@ export default function LandingPage() {
             </div>
 
             {/* Feature Cards - Compact 2x2 grid */}
-            <div className="lg:col-span-3">
-              <div className="grid grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4 h-full">
-                {/* ප්‍රතිපල සමාලෝචනය */}
-                <div className="group relative p-4 sm:p-5 lg:p-4 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md border border-white/20 hover:border-blue-400/40 transition-all duration-300 hover:scale-105">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div className="relative flex flex-col lg:flex-row lg:items-center text-center lg:text-left space-y-2 lg:space-y-0 lg:space-x-3 h-full justify-center">
-                    <div className="p-2 sm:p-2.5 lg:p-2 rounded-xl bg-gradient-to-br from-blue-500/30 to-blue-600/20 mx-auto lg:mx-0 w-fit">
-                      <Brain className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 text-blue-200" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-white text-xs sm:text-sm lg:text-sm">ප්‍රතිපල සමාලෝචනය</h3>
-                      <p className="text-xs sm:text-sm lg:text-xs text-gray-300 leading-relaxed">ප්‍රශ්න පත්‍ර ශ්‍රේණිගත කිරීම</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* දුර්වල ඒකක වර්ගීකරණය */}
-                <div className="group relative p-4 sm:p-5 lg:p-4 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md border border-white/20 hover:border-purple-400/40 transition-all duration-300 hover:scale-105">
-                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div className="relative flex flex-col lg:flex-row lg:items-center text-center lg:text-left space-y-2 lg:space-y-0 lg:space-x-3 h-full justify-center">
-                    <div className="p-2 sm:p-2.5 lg:p-2 rounded-xl bg-gradient-to-br from-purple-500/30 to-purple-600/20 mx-auto lg:mx-0 w-fit">
-                      <Target className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 text-purple-200" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-white text-xs sm:text-sm lg:text-sm">දුර්වල ඒකක වර්ගීකරණය</h3>
-                      <p className="text-xs sm:text-sm lg:text-xs text-gray-300 leading-relaxed">පාඩම් අනුව වර්ගීකරණය</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* ප්‍රගති සමාලෝචනය */}
-                <div className="group relative p-4 sm:p-5 lg:p-4 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md border border-white/20 hover:border-indigo-400/40 transition-all duration-300 hover:scale-105 lg:col-span-1">
-                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div className="relative flex flex-col lg:flex-row lg:items-center text-center lg:text-left space-y-2 lg:space-y-0 lg:space-x-3 h-full justify-center">
-                    <div className="p-2 sm:p-2.5 lg:p-2 rounded-xl bg-gradient-to-br from-indigo-500/30 to-indigo-600/20 mx-auto lg:mx-0 w-fit">
-                      <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 text-indigo-200" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-white text-xs sm:text-sm lg:text-sm">ප්‍රගති සමාලෝචනය</h3>
-                      <p className="text-xs sm:text-sm lg:text-xs text-gray-300 leading-relaxed">සවිස්තර විශේෂණය</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* මාර්ගගත බහුවරණ ප්‍රශ්නපත්‍ */}
-                <div className="group relative p-4 sm:p-5 lg:p-4 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md border border-white/20 hover:border-emerald-400/40 transition-all duration-300 hover:scale-105 lg:col-span-1">
-                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div className="relative flex flex-col lg:flex-row lg:items-center text-center lg:text-left space-y-2 lg:space-y-0 lg:space-x-3 h-full justify-center">
-                    <div className="p-2 sm:p-2.5 lg:p-2 rounded-xl bg-gradient-to-br from-emerald-500/30 to-emerald-600/20 mx-auto lg:mx-0 w-fit">
-                      <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 text-emerald-200" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-white text-xs sm:text-sm lg:text-sm">මාර්ගගත ප්‍රශ්නපත්‍</h3>
-                      <p className="text-xs sm:text-sm lg:text-xs text-gray-300 leading-relaxed">විශේෂයෙන් සකස් කළ</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <FeatureCards />
 
             {/* Login Form - Expanded with better responsive design */}
             <div className="lg:col-span-4">

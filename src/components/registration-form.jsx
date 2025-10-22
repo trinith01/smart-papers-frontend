@@ -28,8 +28,8 @@ import { Link, useNavigate } from "react-router-dom"
 const SUBJECT_OPTIONS = ["Physics", "Chemistry", "Pure-Maths", "Applied Maths", "Biology"]
 
 const CATEGORY_OPTIONS = [
-  { value: "theory", label: "📚 Theory" },
-  { value: "revision", label: "🔄 Revision" },
+
+
   { value: "paper", label: "📝 Paper" },
 ]
 
@@ -48,6 +48,7 @@ export default function Register() {
     institute: userType === "teacher" ? [] : "",
   })
   const [errors, setErrors] = useState({})
+  const [generalError, setGeneralError] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -101,9 +102,12 @@ export default function Register() {
       return newData
     })
 
-    // Clear error when user starts typing/selecting
+    // Clear errors when user starts typing/selecting
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }))
+    }
+    if (generalError) {
+      setGeneralError("")
     }
   }
 
@@ -144,10 +148,9 @@ export default function Register() {
     if (!formData.confirmPassword) newErrors.confirmPassword = "Please confirm your password"
     else if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Passwords do not match"
 
-    if (!formData.institute) newErrors.institute = "Institute is required"
 
     if (userType === "student") {
-      if (!formData.year) newErrors.year = "Year is required"
+      if (!formData.year) newErrors.year = "Please select your academic year"
       else {
         const yearNum = Number(formData.year)
         const currentYear = new Date().getFullYear()
@@ -157,15 +160,15 @@ export default function Register() {
           newErrors.year = `Year must be within 10 years of ${currentYear}`
       }
       studentFollowedTeachers.forEach((ft, idx) => {
-        if (!ft.institute) newErrors[`followedTeachers_${idx}_institute`] = "Institute required"
-        if (!ft.teacher) newErrors[`followedTeachers_${idx}_teacher`] = "Teacher required"
-        if (!ft.category || ft.category.length === 0) newErrors[`followedTeachers_${idx}_category`] = "Select at least one category"
+        if (!ft.institute) newErrors[`followedTeachers_${idx}_institute`] = "Please select an institute"
+        if (!ft.teacher) newErrors[`followedTeachers_${idx}_teacher`] = "Please select a teacher"
+        if (!ft.category || ft.category.length === 0) newErrors[`followedTeachers_${idx}_category`] = "Please select at least one category"
       })
     } else if (userType === "teacher") {
       if (!formData.subjects || (Array.isArray(formData.subjects) && formData.subjects.length === 0))
-        newErrors.subjects = "Subjects are required"
+        newErrors.subjects = "Please select the subjects you teach"
       if (!formData.institute || (Array.isArray(formData.institute) && formData.institute.length === 0))
-        newErrors.institute = "At least one institute is required"
+        newErrors.institute = "Please select at least one institute"
     }
 
     setErrors(newErrors)
@@ -176,6 +179,7 @@ export default function Register() {
     e.preventDefault()
     if (validateForm()) {
       setIsLoading(true)
+      setGeneralError("")
       try {
         console.log("Form submitted:", formData)
         await createUserWithEmailAndPassword(auth, formData.email, formData.password)
@@ -225,15 +229,76 @@ export default function Register() {
     
          navigate("/")
       } catch (error) {
-        let errorMsg = error?.message || "Error creating account"
+        console.error("Registration error:", error)
+        
+        let errorMsg = "Something went wrong. Please try again."
+        
+        // Handle Firebase Auth errors
         if (error?.code) {
-          errorMsg = `${error.code}: ${errorMsg}`
+          switch (error.code) {
+            case 'auth/email-already-in-use':
+              errorMsg = "This email is already registered. Please use a different email or try signing in."
+              break
+            case 'auth/weak-password':
+              errorMsg = "Password is too weak. Please choose a stronger password (at least 6 characters)."
+              break
+            case 'auth/invalid-email':
+              errorMsg = "Please enter a valid email address."
+              break
+            case 'auth/operation-not-allowed':
+              errorMsg = "Email/password accounts are not enabled. Please contact support."
+              break
+            case 'auth/network-request-failed':
+              errorMsg = "Network error. Please check your internet connection and try again."
+              break
+            case 'auth/too-many-requests':
+              errorMsg = "Too many unsuccessful attempts. Please wait a moment before trying again."
+              break
+            default:
+              errorMsg = `Authentication error: ${error.message}`
+              break
+          }
         }
-        if (error?.response?.data?.error) {
-          errorMsg = error.response.data.error
+        // Handle API/Network errors
+        else if (error?.response) {
+          // API returned an error response
+          const status = error.response.status
+          const data = error.response.data
+          
+          if (status === 400) {
+            errorMsg = data?.error || data?.message || "Invalid data provided. Please check your information and try again."
+          } else if (status === 409) {
+            errorMsg = data?.error || "This email or information is already registered. Please use different details."
+          } else if (status === 422) {
+            errorMsg = data?.error || "Please check all required fields and try again."
+          } else if (status === 500) {
+            errorMsg = "Server error. Please try again in a few moments."
+          } else if (status >= 500) {
+            errorMsg = "Server is temporarily unavailable. Please try again later."
+          } else {
+            errorMsg = data?.error || data?.message || `Error ${status}: Please try again.`
+          }
         }
-        toast.error(errorMsg)
-        console.error(error)
+        // Handle network/connection errors
+        else if (error?.request) {
+          errorMsg = "Unable to connect to the server. Please check your internet connection and try again."
+        }
+        // Handle other errors
+        else if (error?.message) {
+          if (error.message.includes('Network Error')) {
+            errorMsg = "Network error. Please check your internet connection and try again."
+          } else if (error.message.includes('timeout')) {
+            errorMsg = "Request timed out. Please check your connection and try again."
+          } else {
+            errorMsg = `Error: ${error.message}`
+          }
+        }
+        
+        setGeneralError(errorMsg)
+        toast.error(errorMsg, {
+          duration: 6000,
+          position: 'top-center',
+        })
       } finally {
         setIsLoading(false)
       }
@@ -251,6 +316,7 @@ export default function Register() {
       teacher: "",
     }))
     setErrors({})
+    setGeneralError("")
   }
 
   return (
@@ -274,6 +340,38 @@ export default function Register() {
           </CardHeader>
 
           <CardContent className="space-y-6">
+            {/* General Error Alert */}
+            {generalError && (
+              <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded-lg">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-red-800">
+                      {generalError}
+                    </p>
+                  </div>
+                  <div className="ml-auto pl-3">
+                    <div className="-mx-1.5 -my-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setGeneralError("")}
+                        className="inline-flex bg-red-50 rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-50 focus:ring-red-600"
+                      >
+                        <span className="sr-only">Dismiss</span>
+                        <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* User Type Selection */}
             <Tabs value={userType} onValueChange={handleUserTypeChange} className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-6">
@@ -388,73 +486,8 @@ export default function Register() {
 
                 <Separator />
 
-                {/* Institute Selection */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <BookOpen className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-800">Institute Information</h3>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="institute" className="text-sm font-medium text-gray-700">
-                      {userType === "teacher" ? "Institutes (Select multiple)" : "Institute"}
-                    </Label>
-                    {userType === "teacher" ? (
-                      <ReactSelect
-                        isMulti
-                        isSearchable
-                        name="institute"
-                        options={INSTITUTES.map((inst) => ({
-                          value: inst._id,
-                          label: `${inst.name} (${inst.location})`,
-                        }))}
-                        value={INSTITUTES.filter(
-                          (inst) => Array.isArray(formData.institute) && formData.institute.includes(inst._id),
-                        ).map((inst) => ({
-                          value: inst._id,
-                          label: `${inst.name} (${inst.location})`,
-                        }))}
-                        onChange={(selected) =>
-                          handleInputChange("institute", selected ? selected.map((opt) => opt.value) : [])
-                        }
-                        classNamePrefix="react-select"
-                        placeholder="Select institutes..."
-                        className={errors.institute ? "border-red-500" : ""}
-                      />
-                    ) : (
-                      <Select
-                        value={formData.institute}
-                        onValueChange={(value) => handleInputChange("institute", value)}
-                      >
-                        <SelectTrigger
-                          className={`transition-all duration-200 ${
-                            errors.institute ? "border-red-500 focus:border-red-500" : "focus:border-blue-500"
-                          }`}
-                        >
-                          <SelectValue placeholder="Select your institute" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {INSTITUTES.map((inst) => (
-                            <SelectItem key={inst._id} value={inst._id}>
-                              <div className="flex items-center justify-between w-full">
-                                <span>{inst.name}</span>
-                                <Badge variant="secondary" className="ml-2">
-                                  {inst.location}
-                                </Badge>
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                    {errors.institute && <p className="text-sm text-red-500">{errors.institute}</p>}
-                  </div>
-                </div>
-                {userType === "student" && formData.institute && (
-                  <p className="text-xs text-blue-600 mt-1">
-                    Teachers will be filtered based on your selected institute
-                  </p>
-                )}
+           
+                
 
                 <Separator />
 
@@ -469,16 +502,23 @@ export default function Register() {
                       <Label htmlFor="year" className="text-sm font-medium text-gray-700">
                         Academic Year
                       </Label>
-                      <Input
-                        id="year"
-                        type="text"
-                        placeholder="e.g., 2024"
+                      <Select
                         value={formData.year}
-                        onChange={(e) => handleInputChange("year", e.target.value)}
-                        className={`transition-all duration-200 ${
-                          errors.year ? "border-red-500 focus:border-red-500" : "focus:border-blue-500"
-                        }`}
-                      />
+                        onValueChange={(value) => handleInputChange("year", value)}
+                      >
+                        <SelectTrigger
+                          className={`transition-all duration-200 ${
+                            errors.year ? "border-red-500 focus:border-red-500" : "focus:border-blue-500"
+                          }`}
+                        >
+                          <SelectValue placeholder="Select academic year" />
+                        </SelectTrigger>
+                        <SelectContent>
+                         
+                          <SelectItem value="2025">2025</SelectItem>
+                   
+                        </SelectContent>
+                      </Select>
                       {errors.year && <p className="text-sm text-red-500">{errors.year}</p>}
                     </div>
                      {/* <div className="space-y-2">

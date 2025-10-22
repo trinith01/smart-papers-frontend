@@ -1,0 +1,43 @@
+🎥 VIDEO UPLOAD PAGE COMPONENT STRUCTURE
+═══════════════════════════════════════════════════════════════════
+
+VideoUploadPage (Main Container)
+│
+├─ 📋 PageHeader
+│  ├─ Props:
+│  │  └─ (none - static header content)
+│  └─ Purpose: Page title and navigation header
+│
+├─ 📤 VideoUploading
+│  ├─ Props:
+│  │  └─ onUpload: function (callback when video upload is initiated)
+│  ├─ Purpose: Video file upload interface
+│  ├─ Features:
+│  │  ├─ Drag & drop file upload
+│  │  ├─ File type validation
+│  │  ├─ Progress indicator
+│  │  ├─ Upload status feedback
+│  │  └─ Error handling
+│  └─ Integration: Connects to video upload service
+│
+└─ 📺 UploadedVideos
+   ├─ Props:
+   │  ├─ uploadedVideos: array (list of successfully uploaded videos)
+   │  └─ deleteVideo: function (callback to delete a video)
+   ├─ Purpose: Display and manage uploaded videos
+   ├─ Features:
+   │  ├─ Video thumbnail previews
+   │  ├─ Video metadata display (name, size, upload date)
+   │  ├─ Play video functionality
+   │  ├─ Delete video option
+   │  └─ Search/filter capabilities
+   └─ State Management: Handles video list updates
+
+═══════════════════════════════════════════════════════════════════
+📝 COMPONENT FLOW:
+1. VideoUploadPage loads → PageHeader + VideoUploading + UploadedVideos
+2. User selects video file → VideoUploading shows progress
+3. Upload completes → Video added to UploadedVideos list
+4. User can play, view details, or delete videos from list
+5. Delete action → Video removed from list and server
+═══════════════════════════════════════════════════════════════════

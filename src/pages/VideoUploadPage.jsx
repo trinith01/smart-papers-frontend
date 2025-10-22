@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import api from "@/services/api";
 import { toast } from "sonner";
+import PageHeader from "@/components/video-upload-page/PageHeader";
 import VideoUploading from "@/components/video-upload-page/VideoUploading";
 import UploadedVideos from "@/components/video-upload-page/UploadedVideos";
 
@@ -61,6 +62,7 @@ export default function VideoUploadPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <PageHeader />
         <VideoUploading onUpload={handleUpload} />
         <UploadedVideos uploadedVideos={uploadedVideos} deleteVideo={deleteVideo} />
       </main>

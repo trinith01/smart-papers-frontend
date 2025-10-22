@@ -13,7 +13,7 @@ import { useLocation } from "react-router-dom"
 import api from "@/services/api"
 
 const answerOptions = ["1", "2", "3", "4", "5"]
-const answerLabels = ["A", "B", "C", "D", "E"]
+const answerLabels = ["1", "2", "3", "4", "5"]
 
 export default function StudentQuizPage() {
   const location = useLocation()
@@ -110,9 +110,19 @@ export default function StudentQuizPage() {
   // Auto-submit when timeLeft reaches 0
   useEffect(() => {
     if (isQuizStarted && !isQuizCompleted && timeLeft === 0) {
-      handleSubmitQuiz()
+      const unansweredCount = mockQuiz.totalQuestions - getAnsweredCount()
+      if (unansweredCount > 0) {
+        toast.error(`Time's up! Auto-submitting quiz with ${unansweredCount} unanswered question(s) marked as option 1.`, {
+          duration: 5000
+        })
+      } else {
+        toast.info("Time's up! Auto-submitting your quiz.", {
+          duration: 3000
+        })
+      }
+      handleSubmitQuiz(true) // Pass true to indicate this is a timeout submission
     }
-  }, [isQuizStarted, isQuizCompleted, timeLeft])
+  }, [isQuizStarted, isQuizCompleted, timeLeft, mockQuiz.totalQuestions, answers])
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60)
@@ -134,11 +144,21 @@ export default function StudentQuizPage() {
   }
 
   // Submit quiz: prevent duplicate submissions, clear localStorage
-  const handleSubmitQuiz = async () => {
+  const handleSubmitQuiz = async (isTimeOut = false) => {
     if (isQuizCompleted) return // prevent multiple submissions
 
     const storedUser = localStorage.getItem("userData")
     const loggedInUser = storedUser ? JSON.parse(storedUser) : null
+
+    // For manual submission, check if all questions are answered
+    const unansweredCount = mockQuiz.totalQuestions - getAnsweredCount()
+    if (!isTimeOut && unansweredCount > 0) {
+      toast.error(`Please answer all questions before submitting. You have ${unansweredCount} unanswered question(s).`, {
+        duration: 4000
+      })
+      setShowConfirmDialog(false)
+      return // Don't submit if questions are unanswered and it's not a timeout
+    }
 
     setIsQuizCompleted(true)
     setShowConfirmDialog(false)
@@ -148,9 +168,12 @@ export default function StudentQuizPage() {
       localStorage.removeItem(getLocalStorageKey(mockQuiz.id))
     }
 
+    // Map answers - for timeout, use default answer 0 for unanswered questions
     const answersArray = mockQuiz.questions.map((q) => {
       const ans = answers[q._id || q.id] || null
-      const answerIndex = ans ? answerOptions.indexOf(ans) : null
+      // For manual submission: use actual answers (all should be answered by now)
+      // For timeout: use actual answers or default to index 0 for unanswered
+      const answerIndex = ans ? answerOptions.indexOf(ans) : (isTimeOut ? 0 : null)
       return {
         questionId: q._id || q.id,
         answer: answerIndex,
@@ -517,16 +540,14 @@ export default function StudentQuizPage() {
               Are you sure you want to submit your quiz? You have answered{" "}
               <span className="font-semibold text-blue-600">{getAnsweredCount()}</span> out of{" "}
               <span className="font-semibold">{mockQuiz.totalQuestions}</span> questions.
-              {getAnsweredCount() < mockQuiz.totalQuestions && (
-                <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                  <div className="flex items-center text-amber-800">
-                    <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0" />
-                    <span className="font-medium">
-                      Warning: You have {mockQuiz.totalQuestions - getAnsweredCount()} unanswered questions.
-                    </span>
-                  </div>
+              <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center text-green-800">
+                  <CheckCircle className="w-5 h-5 mr-2 flex-shrink-0" />
+                  <span className="font-medium">
+                    All questions have been answered. Ready to submit!
+                  </span>
                 </div>
-              )}
+              </div>
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end space-x-3 mt-6">
@@ -534,7 +555,7 @@ export default function StudentQuizPage() {
               Continue Quiz
             </Button>
             <Button
-              onClick={handleSubmitQuiz}
+              onClick={() => handleSubmitQuiz(false)}
               className="px-6 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
             >
               Submit Quiz

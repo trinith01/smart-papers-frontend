@@ -1,0 +1,107 @@
+👨‍🏫 TEACHER UNIT MANAGER COMPONENT STRUCTURE
+═══════════════════════════════════════════════════════════════════
+
+TeacherUnitManager (Main Container)
+│
+├─ 📋 PageHeader
+│  └─ Purpose: Page title and navigation header
+│
+├─ ➕ SingleUnitForm
+│  ├─ Props:
+│  │  ├─ newUnit: object (new unit form data)
+│  │  ├─ onUnitChange: function (unit input change handler)
+│  │  └─ onAddUnit: function (add single unit handler)
+│  ├─ Purpose: Add individual units one at a time
+│  ├─ Features:
+│  │  ├─ Unit name input
+│  │  ├─ Unit description
+│  │  ├─ Subject/category selection
+│  │  ├─ Form validation
+│  │  └─ Submit button
+│  └─ Integration: Connects to unit creation API
+│
+├─ 📚 BulkUnitsForm
+│  ├─ Props:
+│  │  ├─ bulkUnits: array (bulk units data)
+│  │  ├─ onBulkUnitChange: function (bulk unit change handler)
+│  │  ├─ onSubunitChange: function (subunit change handler)
+│  │  ├─ onAddBulkUnit: function (add bulk unit handler)
+│  │  ├─ onAddSubunitToBulk: function (add subunit to bulk unit)
+│  │  └─ onBulkAdd: function (bulk add all units handler)
+│  ├─ Purpose: Add multiple units and subunits in batch
+│  ├─ Features:
+│  │  ├─ Multiple unit input fields
+│  │  ├─ Dynamic subunit addition
+│  │  ├─ Bulk validation
+│  │  ├─ CSV import functionality
+│  │  └─ Batch processing
+│  └─ Integration: Handles bulk unit creation
+│
+├─ 📝 CurrentUnitsList
+│  ├─ Props:
+│  │  ├─ units: array (list of existing units)
+│  │  ├─ editingUnit: string (ID of unit being edited)
+│  │  ├─ editValues: object (edited unit values)
+│  │  ├─ newSubunitInputs: object (new subunit input states)
+│  │  ├─ editingSubunit: string (ID of subunit being edited)
+│  │  ├─ onEditValuesChange: function (edit values change handler)
+│  │  ├─ onStartEditingUnit: function (start editing unit)
+│  │  ├─ onCancelEditingUnit: function (cancel editing unit)
+│  │  ├─ onUpdateUnit: function (update unit handler)
+│  │  ├─ onDeleteUnit: function (delete unit handler)
+│  │  ├─ onShowNewSubunitInputs: function (show subunit inputs)
+│  │  ├─ onHideNewSubunitInputs: function (hide subunit inputs)
+│  │  ├─ onNewSubunitChange: function (new subunit change handler)
+│  │  ├─ onAddSubunit: function (add subunit handler)
+│  │  ├─ onStartEditingSubunit: function (start editing subunit)
+│  │  ├─ onCancelEditingSubunit: function (cancel editing subunit)
+│  │  ├─ onUpdateSubunit: function (update subunit handler)
+│  │  └─ onDeleteSubunit: function (delete subunit handler)
+│  ├─ Purpose: Display and manage existing units
+│  ├─ Features:
+│  │  ├─ Expandable unit cards
+│  │  ├─ Inline editing
+│  │  ├─ Subunit management
+│  │  ├─ Delete confirmation
+│  │  ├─ Search and filter
+│  │  └─ Sorting options
+│  │
+│  └─ 🃏 UnitCard
+│     ├─ Props:
+│     │  ├─ unit: object (unit data)
+│     │  ├─ editingUnit: string (editing state)
+│     │  ├─ editValues: object (edit values)
+│     │  ├─ newSubunitInputs: object (subunit inputs)
+│     │  ├─ editingSubunit: string (subunit editing state)
+│     │  └─ all handler props (same as CurrentUnitsList)
+│     ├─ Purpose: Individual unit display and interaction
+│     ├─ Features:
+│     │  ├─ Unit information display
+│     │  ├─ Edit mode toggle
+│     │  ├─ Subunit list
+│     │  ├─ Add/edit/delete subunits
+│     │  ├─ Save/cancel actions
+│     │  └─ Visual feedback
+│     └─ Integration: Handles unit-level operations
+│
+└─ 📡 ApiResponse
+   ├─ Props:
+   │  └─ response: object (API response data)
+   ├─ Purpose: Display API operation results
+   ├─ Features:
+   │  ├─ Success/error messages
+   │  ├─ Loading states
+   │  ├─ Response details
+   │  ├─ Auto-dismiss functionality
+   │  └─ Retry options
+   └─ Integration: Shows feedback from unit operations
+
+═══════════════════════════════════════════════════════════════════
+📝 COMPONENT FLOW:
+1. TeacherUnitManager loads → PageHeader + SingleUnitForm + BulkUnitsForm + CurrentUnitsList + ApiResponse
+2. User adds single unit → SingleUnitForm submits → CurrentUnitsList updates
+3. User adds bulk units → BulkUnitsForm processes → CurrentUnitsList updates
+4. User edits unit → UnitCard enters edit mode → Changes saved via handlers
+5. User manages subunits → UnitCard handles subunit operations
+6. API operations → ApiResponse shows success/error feedback
+═══════════════════════════════════════════════════════════════════

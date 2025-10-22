@@ -1,0 +1,91 @@
+📝 CREATE PAPER COMPONENT STRUCTURE
+═══════════════════════════════════════════════════════════════════
+
+CreatePaper (Main Container)
+│
+├─ 📋 PageHeader
+│  ├─ Props:
+│  │  └─ (none - static header content)
+│  └─ Purpose: Page title and navigation header
+│
+├─ ⚙️ PaperConfiguration
+│  ├─ Props:
+│  │  ├─ paperTitle: string (paper title input value)
+│  │  ├─ setPaperTitle: function (paper title setter)
+│  │  ├─ subject: string (selected subject)
+│  │  ├─ setSubject: function (subject setter)
+│  │  ├─ paperCategory: string (paper category selection)
+│  │  ├─ setPaperCategory: function (category setter)
+│  │  ├─ year: number (paper year)
+│  │  ├─ setYear: function (year setter)
+│  │  ├─ questionCount: number (number of questions)
+│  │  ├─ handleQuestionCountChange: function (question count handler)
+│  │  ├─ questions: array (questions array)
+│  │  ├─ initializeQuestions: function (initialize questions array)
+│  │  ├─ isSubmitting: boolean (submission state)
+│  │  ├─ minYear: number (minimum allowed year)
+│  │  └─ maxYear: number (maximum allowed year)
+│  └─ Purpose: Basic paper setup and configuration
+│
+├─ 📅 AvailabilitySlots
+│  ├─ Props:
+│  │  ├─ availability: array (availability time slots)
+│  │  ├─ institutes: array (available institutes)
+│  │  ├─ addAvailabilitySlot: function (add new slot)
+│  │  ├─ updateAvailability: function (update existing slot)
+│  │  ├─ removeAvailabilitySlot: function (remove slot)
+│  │  └─ isSubmitting: boolean (submission state)
+│  └─ Purpose: Manage paper availability and scheduling
+│
+├─ ✏️ QuestionEditor
+│  ├─ Props:
+│  │  ├─ questions: array (questions data)
+│  │  ├─ updateQuestion: function (update question handler)
+│  │  ├─ handleImageUpload: function (image upload handler)
+│  │  ├─ units: array (available units/subjects)
+│  │  ├─ setQuestions: function (questions setter)
+│  │  ├─ handleSubmit: function (form submission handler)
+│  │  └─ isSubmitting: boolean (submission state)
+│  ├─ Purpose: Create and edit individual questions
+│  ├─ Features:
+│  │  ├─ Rich text editor for questions
+│  │  ├─ Image upload for questions
+│  │  ├─ Multiple choice options
+│  │  ├─ Correct answer selection
+│  │  └─ Unit/subject assignment
+│  └─ Integration: Connects to question management system
+│
+├─ 📚 PastPapersTable
+│  ├─ Props:
+│  │  ├─ pastPapers: array (list of past papers)
+│  │  └─ handlePreview: function (preview paper handler)
+│  ├─ Purpose: Display and manage past papers
+│  ├─ Features:
+│  │  ├─ Search and filter past papers
+│  │  ├─ Sort by date, subject, category
+│  │  ├─ Preview paper functionality
+│  │  └─ Delete/edit options
+│  └─ Integration: Connects to paper repository
+│
+└─ 👁️ PreviewDialog
+   ├─ Props:
+   │  ├─ isPreviewOpen: boolean (dialog visibility state)
+   │  ├─ setIsPreviewOpen: function (dialog state setter)
+   │  └─ selectedPaper: object (paper to preview)
+   ├─ Purpose: Modal preview of paper before submission
+   ├─ Features:
+   │  ├─ Full paper layout preview
+   │  ├─ Question-by-question view
+   │  ├─ Print-friendly format
+   │  └─ Edit and close options
+   └─ Integration: Renders paper in preview mode
+
+═══════════════════════════════════════════════════════════════════
+📝 COMPONENT FLOW:
+1. CreatePaper loads → PageHeader + PaperConfiguration + AvailabilitySlots + QuestionEditor + PastPapersTable
+2. User configures paper → PaperConfiguration updates state
+3. User sets availability → AvailabilitySlots manages scheduling
+4. User creates questions → QuestionEditor handles question creation
+5. User previews paper → PreviewDialog opens with selected paper
+6. User submits → All components coordinate for final submission
+═══════════════════════════════════════════════════════════════════

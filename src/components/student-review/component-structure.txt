@@ -1,0 +1,58 @@
+📚 STUDENT REVIEW COMPONENT STRUCTURE
+═══════════════════════════════════════════════════════════════════
+
+StudentReview (Main Container)
+│
+├─ 📋 PageHeader
+│  ├─ Props:
+│  │  └─ paperTitle: string (title of the paper being reviewed)
+│  └─ Purpose: Shows paper title and navigation
+│
+├─ 📊 PerformanceSummary
+│  ├─ Props:
+│  │  └─ review: object (overall performance data)
+│  └─ Purpose: Displays summary statistics (score, percentage, etc.)
+│
+├─ ✅ AnswersSection (Correct Answers)
+│  ├─ Props:
+│  │  ├─ answers: array (list of correct answers)
+│  │  ├─ isCorrect: boolean (always true for this section)
+│  │  └─ onReviewClick: function (callback when answer is clicked for review)
+│  │
+│  └─ 🃏 AnswerCard
+│     ├─ Props:
+│     │  ├─ answer: object (individual answer data)
+│     │  ├─ index: number (answer index/position)
+│     │  ├─ isCorrect: boolean (answer correctness flag)
+│     │  └─ onReviewClick: function (callback to review this answer)
+│     └─ Purpose: Individual answer card with question details
+│
+├─ ❌ AnswersSection (Incorrect Answers)
+│  ├─ Props:
+│  │  ├─ answers: array (list of incorrect answers)
+│  │  ├─ isCorrect: boolean (always false for this section)
+│  │  └─ onReviewClick: function (callback when answer is clicked for review)
+│  │
+│  └─ 🃏 AnswerCard
+│     ├─ Props:
+│     │  ├─ answer: object (individual answer data)
+│     │  ├─ index: number (answer index/position)
+│     │  ├─ isCorrect: boolean (answer correctness flag)
+│     │  └─ onReviewClick: function (callback to review this answer)
+│     └─ Purpose: Individual answer card with question details
+│
+└─ 🔍 ReviewDialog
+   ├─ Props:
+   │  ├─ isOpen: boolean (dialog visibility state)
+   │  ├─ onOpenChange: function (dialog state setter)
+   │  └─ selectedQuestion: object (question being reviewed)
+   └─ Purpose: Modal dialog for detailed question review
+
+═══════════════════════════════════════════════════════════════════
+📝 COMPONENT FLOW:
+1. StudentReview loads → PageHeader + PerformanceSummary displayed
+2. Two sections render: Correct Answers + Incorrect Answers
+3. Each section contains multiple AnswerCard components
+4. AnswerCard clicked → ReviewDialog opens with selected question
+5. ReviewDialog shows detailed question analysis and explanations
+═══════════════════════════════════════════════════════════════════

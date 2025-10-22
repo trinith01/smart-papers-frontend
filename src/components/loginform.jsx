@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { signInWithEmailAndPassword } from "firebase/auth"
 import { useNavigate } from "react-router-dom"
 import { cn } from "@/lib/utils"
@@ -19,59 +19,171 @@ export function LoginForm({ className, ...props }) {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [isOnline, setIsOnline] = useState(navigator.onLine)
+  const [success, setSuccess] = useState("")
   const navigate = useNavigate()
+
+  // Monitor network status
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true)
+      if (error && (error.includes("internet") || error.includes("network"))) {
+        setError("")
+      }
+    }
+    const handleOffline = () => {
+      setIsOnline(false)
+      setError("You are currently offline. Please check your internet connection.")
+    }
+
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [error])
+
+  // Helper function to get human-readable error messages
+  const getErrorMessage = (error) => {
+    // Firebase Authentication errors
+    if (error.code) {
+      switch (error.code) {
+        case 'auth/invalid-email':
+          return "Please enter a valid email address."
+        case 'auth/user-disabled':
+          return "This account has been disabled. Please contact support."
+        case 'auth/user-not-found':
+          return "No account found with this email address. Please check your email or sign up."
+        case 'auth/wrong-password':
+          return "Incorrect password. Please try again."
+        case 'auth/invalid-credential':
+          return "Invalid email or password. Please check your credentials."
+        case 'auth/too-many-requests':
+          return "Too many failed login attempts. Please try again later or reset your password."
+        case 'auth/network-request-failed':
+          return "Network connection failed. Please check your internet connection and try again."
+        case 'auth/timeout':
+          return "Connection timeout. Please check your internet connection and try again."
+        case 'auth/invalid-login-credentials':
+          return "Invalid login credentials. Please check your email and password."
+        case 'auth/email-already-in-use':
+          return "This email is already registered. Try logging in instead."
+        case 'auth/weak-password':
+          return "Password is too weak. Please choose a stronger password."
+        default:
+          return error.message || "Authentication failed. Please try again."
+      }
+    }
+
+    // Network and API errors
+    if (error.message) {
+      if (error.message.includes('Network Error') || error.message.includes('fetch')) {
+        return "Unable to connect to the server. Please check your internet connection and try again."
+      }
+      if (error.message.includes('timeout')) {
+        return "Request timed out. Please check your connection and try again."
+      }
+      if (error.message.includes('500')) {
+        return "Server error occurred. Please try again in a few moments."
+      }
+      if (error.message.includes('404')) {
+        return "Service not available. Please contact support if this persists."
+      }
+    }
+
+    // Default fallback messages
+    if (!navigator.onLine) {
+      return "No internet connection. Please check your network and try again."
+    }
+
+    return "Login failed. Please check your email and password and try again."
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError("")
+    setSuccess("")
     setLoading(true)
+    
+    // Basic validation
+    if (!email || !password) {
+      setError("Please enter both email and password.")
+      setLoading(false)
+      return
+    }
+
+    if (!email.includes('@')) {
+      setError("Please enter a valid email address.")
+      setLoading(false)
+      return
+    }
+
     try {
+      // Check network connectivity first
+      if (!navigator.onLine) {
+        throw new Error("No internet connection")
+      }
+
       // Sign in user with Firebase Auth
       const userCredential = await signInWithEmailAndPassword(auth, email, password)
       const user = userCredential.user
       const uid = user.uid
+      
       // Get Firebase custom claims (must be set server-side)
       const idTokenResult = await user.getIdTokenResult()
       const role = idTokenResult.claims.role
       console.log("User UID:", uid)
       console.log("User role:", role)
+      
       let res
-      if (role === "student") {
-        res = await api.get(`/api/students/${uid}`)
-      } else if (role === "teacher") {
-        res = await api.get(`/api/teachers/${uid}`)
-      } else {
-        res = {
-          data: {
-            name: "Unknown",
-            email: user.email,
-            role: role || "Unknown",
-          },
+      try {
+        if (role === "student") {
+          res = await api.get(`/api/students/${uid}`)
+        } else if (role === "teacher") {
+          res = await api.get(`/api/teachers/${uid}`)
+        } else {
+          res = {
+            data: {
+              name: "Unknown",
+              email: user.email,
+              role: role || "Unknown",
+            },
+          }
         }
+      } catch (apiError) {
+        console.error("API Error:", apiError)
+        throw new Error("Unable to fetch user profile. Please try again.")
       }
+      
       // Only store if data is valid
       if (res && res.data) {
         localStorage.setItem("userData", JSON.stringify(res.data))
         localStorage.setItem("userRole", role || "Unknown")
-        toast("Login successful!")
-        // Only navigate after storage
-        if (role === "student") {
-          navigate("/my-performance")
-        } else if (role === "teacher") {
-          navigate("/analytics")
-        } else {
-          navigate("/")
-        }
+        
+        setSuccess("Login successful! Redirecting...")
+        toast.success("Welcome back! Login successful.")
+        
+        // Delay navigation slightly to show success message
+        setTimeout(() => {
+          if (role === "student") {
+            navigate("/my-performance")
+          } else if (role === "teacher") {
+            navigate("/analytics")
+          } else {
+            navigate("/")
+          }
+        }, 1000)
       } else {
-        setError("Failed to retrieve user data.")
-        toast.error("Failed to retrieve user data.")
+        throw new Error("Unable to load your profile data. Please try logging in again.")
       }
 
-      // or role-based navigation
     } catch (err) {
-      console.error(err)
-      setError("Invalid email or password")
-      toast.error("Invalid email or password")
+      console.error("Login error:", err)
+      const errorMessage = getErrorMessage(err)
+      setError(errorMessage)
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -85,11 +197,19 @@ export function LoginForm({ className, ...props }) {
         <div className="relative z-10 space-y-6">
           <div className="text-center space-y-3">
             <div className="flex items-center justify-center gap-2 mb-4">
-      
               <h1 className="text-2xl font-bold text-white">Login to your account</h1>
-           
             </div>
             <p className="text-gray-300">Enter your email below to login to your account</p>
+            
+            {/* Network status indicator */}
+            {!isOnline && (
+              <div className="flex items-center justify-center gap-2 p-2 bg-red-500/20 border border-red-400/30 rounded-lg">
+                <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-12.728 12.728m0 0L12 12m-6.364 6.364L12 12" />
+                </svg>
+                <span className="text-red-300 text-sm">No internet connection</span>
+              </div>
+            )}
           </div>
 
           <form className={cn("space-y-6", className)} {...props} onSubmit={handleSubmit}>
@@ -144,15 +264,47 @@ export function LoginForm({ className, ...props }) {
             </div>
 
             {error && (
-              <div className="p-3 rounded-xl bg-red-500/20 border border-red-400/30 text-red-300 text-sm text-center">
-                {error}
+              <div className="relative">
+                <div className="p-4 rounded-xl bg-red-500/15 border border-red-400/25 backdrop-blur-sm">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0">
+                      <svg className="w-5 h-5 text-red-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-red-300 text-sm font-medium leading-relaxed">
+                        {error}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {success && (
+              <div className="relative">
+                <div className="p-4 rounded-xl bg-green-500/15 border border-green-400/25 backdrop-blur-sm">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0">
+                      <svg className="w-5 h-5 text-green-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-green-300 text-sm font-medium leading-relaxed">
+                        {success}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 
             <Button
               type="submit"
-              className="w-full h-12 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-white/25 group relative overflow-hidden border border-white/30"
-              disabled={loading}
+              className="w-full h-12 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-xl transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-white/25 group relative overflow-hidden border border-white/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              disabled={loading || !isOnline}
             >
               <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
 
@@ -175,6 +327,13 @@ export function LoginForm({ className, ...props }) {
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
                   </svg>
                   Signing in...
+                </div>
+              ) : !isOnline ? (
+                <div className="flex items-center gap-2 relative z-10">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-12.728 12.728m0 0L12 12m-6.364 6.364L12 12" />
+                  </svg>
+                  No Internet Connection
                 </div>
               ) : (
                 <div className="flex items-center gap-2 relative z-10">
