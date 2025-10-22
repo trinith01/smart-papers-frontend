@@ -16,32 +16,97 @@ export default function LeaderBoardPage() {
   const [paperStats, setPaperStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [statsNotReady, setStatsNotReady] = useState(false);
+  const [paperInfo, setPaperInfo] = useState(null);
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const [countdown, setCountdown] = useState('');
 
   useEffect(() => {
     const fetchLeaderboardData = async () => {
       try {
-        setLoading(true);
+        if (!autoRefresh) setLoading(true);
         setError(null);
+        setStatsNotReady(false);
         
-        ;
-        
-        //Uncomment for real API:
         const response = await api.get(`/api/paperStats/${paperId}`);
+        console.log("Paper ID:", paperId);
         console.log("API Response:", response);
         const result = response.data;
-        if (!response.data.ok) throw new Error(`Failed to fetch: ${response.status}`);
         
-        if (result.ok && result.data) setPaperStats(result.data);
+        // Handle case when stats are not ready
+        if (result.statsNotReady) {
+          setStatsNotReady(true);
+          setPaperInfo(result.data);
+          setAutoRefresh(true);
+        } else if (result.ok && result.data) {
+          setPaperStats(result.data);
+          setAutoRefresh(false);
+        } else {
+          throw new Error(`Failed to fetch: ${response.status}`);
+        }
         
       } catch (err) {
         setError(err.message);
+        setAutoRefresh(false);
       } finally {
         setLoading(false);
       }
     };
 
     fetchLeaderboardData();
-  }, []);
+  }, [paperId]);
+
+  // Auto-refresh effect when stats are not ready
+  useEffect(() => {
+    let interval;
+    let countdownInterval;
+    
+    if (statsNotReady && paperInfo?.statsAvailableAt) {
+      const availableTime = new Date(paperInfo.statsAvailableAt).getTime();
+      
+      // Update countdown every second
+      const updateCountdown = () => {
+        const now = new Date().getTime();
+        const timeDiff = availableTime - now;
+        
+        if (timeDiff <= 0) {
+          setCountdown("Available now! Refreshing...");
+          setTimeout(() => window.location.reload(), 1000);
+          return;
+        }
+        
+        const minutes = Math.floor(timeDiff / (1000 * 60));
+        const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+        
+        if (minutes > 0) {
+          setCountdown(`Available in ${minutes}m ${seconds}s`);
+        } else {
+          setCountdown(`Available in ${seconds}s`);
+        }
+      };
+      
+      // Initial countdown update
+      updateCountdown();
+      
+      // Update countdown every second
+      countdownInterval = setInterval(updateCountdown, 1000);
+      
+      // Check for availability every 5 seconds
+      interval = setInterval(() => {
+        const currentTime = new Date().getTime();
+        const timeRemaining = availableTime - currentTime;
+        
+        if (timeRemaining <= 0) {
+          window.location.reload();
+        }
+      }, 5000);
+    }
+    
+    return () => {
+      if (interval) clearInterval(interval);
+      if (countdownInterval) clearInterval(countdownInterval);
+    };
+  }, [statsNotReady, paperInfo]);
 
   if (loading) {
     return (
@@ -78,6 +143,100 @@ export default function LeaderBoardPage() {
             </button>
           </AlertDescription>
         </Alert>
+      </div>
+    );
+  }
+
+  if (statsNotReady && paperInfo) {
+    const formatTime = (dateString) => {
+      return new Date(dateString).toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+    };
+
+
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-6">
+        <div className="max-w-2xl w-full">
+          <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
+            <CardHeader className="text-center space-y-4">
+              <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                <Clock className="h-8 w-8 text-white" />
+              </div>
+              <CardTitle className="text-2xl font-bold text-slate-800">
+                Leaderboard Processing
+              </CardTitle>
+              <CardDescription className="text-base text-slate-600">
+                {paperInfo.paper?.title}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6 text-center">
+              <Alert className="border-blue-200 bg-blue-50">
+                <AlertCircle className="h-5 w-5 text-blue-600" />
+                <AlertTitle className="text-blue-800 font-semibold">
+                  Stats Not Ready Yet
+                </AlertTitle>
+                <AlertDescription className="text-blue-700 mt-2">
+                  {paperInfo.message}
+                </AlertDescription>
+              </Alert>
+              
+              {paperInfo.paperEndTime && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Card className="border-slate-200 bg-slate-50">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm text-slate-600 flex items-center gap-2">
+                          <Clock className="h-4 w-4" />
+                          Paper Ended At
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-lg font-semibold text-slate-800">
+                          {formatTime(paperInfo.paperEndTime)}
+                        </p>
+                      </CardContent>
+                    </Card>
+                    
+                    {paperInfo.statsAvailableAt && (
+                      <Card className="border-green-200 bg-green-50">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm text-green-600 flex items-center gap-2">
+                            <BarChart3 className="h-4 w-4" />
+                            Stats Available
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                        <p className="text-lg font-semibold text-green-800">
+                          {countdown || "Calculating..."}
+                        </p>
+                          <p className="text-sm text-green-600 mt-1">
+                            {formatTime(paperInfo.statsAvailableAt)}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
+                </div>
+              )}
+              
+              <div className="pt-4">
+                <button 
+                  onClick={() => window.location.reload()} 
+                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 font-medium shadow-lg"
+                >
+                  Refresh Page
+                </button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
