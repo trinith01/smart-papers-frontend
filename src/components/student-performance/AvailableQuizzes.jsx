@@ -13,6 +13,22 @@ export default function AvailableQuizzes({
   preferredTeacher, 
   loading 
 }) {
+  // Get logged-in user's institute ID from their first followed teacher
+  const getLoggedUserInstituteId = () => {
+    const storedUser = localStorage.getItem("userData")
+    const loggedInUser = storedUser ? JSON.parse(storedUser) : null
+    return loggedInUser?.followedTeachers?.[0]?.institute?._id || loggedInUser?.followedTeachers?.[0]?.institute
+  }
+
+  // Find availability for the logged-in user's institute
+  const getAvailabilityForUserInstitute = (quiz) => {
+    const userInstituteId = getLoggedUserInstituteId()
+    if (!userInstituteId || !quiz.availability) return null
+    
+    return quiz.availability.find(avail => 
+      avail.institute === userInstituteId || avail.institute?._id === userInstituteId
+    )
+  }
   // Categorize quizzes based on their availability
   const categorizeQuizzes = () => {
     const now = new Date()
@@ -20,10 +36,10 @@ export default function AvailableQuizzes({
     const future = []
     
     availableQuizzes.forEach(quiz => {
-      if (quiz.availability && quiz.availability.length > 0) {
-        const avail = quiz.availability[0]
-        const start = new Date(avail.startTime)
-        const end = new Date(avail.endTime)
+      const userAvailability = getAvailabilityForUserInstitute(quiz)
+      if (userAvailability) {
+        const start = new Date(userAvailability.startTime)
+        const end = new Date(userAvailability.endTime)
         
         if (now >= start && now <= end) {
           current.push(quiz)
@@ -49,10 +65,10 @@ export default function AvailableQuizzes({
       }
     }
     
-    if (quiz.availability && quiz.availability.length > 0) {
-      const avail = quiz.availability[0]
-      const start = new Date(avail.startTime)
-      const end = new Date(avail.endTime)
+    const userAvailability = getAvailabilityForUserInstitute(quiz)
+    if (userAvailability) {
+      const start = new Date(userAvailability.startTime)
+      const end = new Date(userAvailability.endTime)
       
       if (now < start) {
         return { 
@@ -240,10 +256,14 @@ export default function AvailableQuizzes({
                 </span>
               </div>
               <p className="break-words">
-                {status.variant === "pending" 
-                  ? new Date(quiz.availability[0].startTime).toLocaleString()
-                  : new Date(quiz.availability[0].endTime).toLocaleString()
-                }
+                {(() => {
+                  const userAvailability = getAvailabilityForUserInstitute(quiz)
+                  if (!userAvailability) return "Time not available"
+                  
+                  return status.variant === "pending" 
+                    ? new Date(userAvailability.startTime).toLocaleString()
+                    : new Date(userAvailability.endTime).toLocaleString()
+                })()}
               </p>
             </div>
           )}
@@ -265,13 +285,22 @@ export default function AvailableQuizzes({
                   quizId: quiz._id,
                   title: quiz.title,
                   questions: quiz.questions,
-                  timeLimit: quiz.availability?.[0] 
-                    ? Math.round((new Date(quiz.availability[0].endTime) - new Date(quiz.availability[0].startTime)) / 60000)
-                    : 60,
+                  timeLimit: (() => {
+                    const userAvailability = getAvailabilityForUserInstitute(quiz)
+                    return userAvailability 
+                      ? Math.round((new Date(userAvailability.endTime) - new Date(userAvailability.startTime)) / 60000)
+                      : 60
+                  })(),
                   totalQuestions: quiz.questions.length,
                   subject: quiz.subject,
-                  startTime: quiz.availability?.[0]?.startTime,
-                  endTime: quiz.availability?.[0]?.endTime,
+                  startTime: (() => {
+                    const userAvailability = getAvailabilityForUserInstitute(quiz)
+                    return userAvailability?.startTime
+                  })(),
+                  endTime: (() => {
+                    const userAvailability = getAvailabilityForUserInstitute(quiz)
+                    return userAvailability?.endTime
+                  })(),
                 }}
               >
                 <Star className="h-4 w-4 mr-2" />
