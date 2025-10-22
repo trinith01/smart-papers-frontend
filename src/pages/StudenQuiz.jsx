@@ -180,14 +180,20 @@ export default function StudentQuizPage() {
       }
     })
 
+    // Get the institute ID from the logged-in user's first (0th) followed teacher
+    const preferredTeacher = loggedInUser?.followedTeachers?.[0]
+    const instituteId = preferredTeacher?.institute
+
     const submission = {
       paperId: mockQuiz.id,
       studentId: loggedInUser?._id,
       answers: answersArray,
+      instituteId: instituteId,
     }
 
     try {
       const res = await api.post("/api/submissions", submission)
+      console.log("Quiz submission response:", res.data)
       if (res.status === 200) {
         toast.success("Quiz Submitted: Your answers have been submitted successfully!")
       }
