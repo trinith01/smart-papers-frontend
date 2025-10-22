@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Trophy, Medal, TrendingDown, Users, BookOpen, Target, AlertCircle, Loader2, Award, Clock, BarChart3, Crown, Star } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Trophy, Medal, TrendingDown, Users, BookOpen, Target, AlertCircle, Loader2, Award, Clock, BarChart3, Crown, Star, X } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend, Cell } from "recharts";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import api from '@/services/api';
 import { useParams } from 'react-router-dom';
+import { getImageUrl } from '@/lib/utils';
 
 // Sample data for demonstration
 
@@ -20,6 +22,18 @@ export default function LeaderBoardPage() {
   const [paperInfo, setPaperInfo] = useState(null);
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [countdown, setCountdown] = useState('');
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const openImageDialog = (imageSrc, imageTitle) => {
+    setSelectedImage({ src: getImageUrl(imageSrc), title: imageTitle });
+    setIsDialogOpen(true);
+  };
+
+  const closeImageDialog = () => {
+    setIsDialogOpen(false);
+    setSelectedImage(null);
+  };
 
   useEffect(() => {
     const fetchLeaderboardData = async () => {
@@ -422,10 +436,10 @@ export default function LeaderBoardPage() {
                             {question.questionIndex?.questionImage && (
                               <div className="relative group">
                                 <img 
-                                  src={question.questionIndex.questionImage}
+                                  src={getImageUrl(question.questionIndex.questionImage)}
                                   alt="Question"
                                   className="w-12 h-12 object-cover rounded-lg border-2 border-purple-200 cursor-pointer hover:border-purple-400 transition-colors"
-                                  onClick={() => window.open(question.questionIndex.questionImage, '_blank')}
+                                  onClick={() => openImageDialog(question.questionIndex.questionImage, `Question ${question.questionIndex?.questionIndex + 1 || index + 1} - Question Image`)}
                                 />
                                 <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                                   Question Image
@@ -435,10 +449,10 @@ export default function LeaderBoardPage() {
                             {question.questionIndex?.answerReviewImage && (
                               <div className="relative group">
                                 <img 
-                                  src={question.questionIndex.answerReviewImage}
+                                  src={getImageUrl(question.questionIndex.answerReviewImage)}
                                   alt="Answer Review"
                                   className="w-12 h-12 object-cover rounded-lg border-2 border-orange-200 cursor-pointer hover:border-orange-400 transition-colors"
-                                  onClick={() => window.open(question.questionIndex.answerReviewImage, '_blank')}
+                                  onClick={() => openImageDialog(question.questionIndex.answerReviewImage, `Question ${question.questionIndex?.questionIndex + 1 || index + 1} - Answer Review`)}
                                 />
                                 <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                                   Answer Review
@@ -624,6 +638,34 @@ export default function LeaderBoardPage() {
         </Card>
 
       </div>
+
+      {/* Image Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+          <DialogHeader>
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-lg font-semibold">
+                {selectedImage?.title}
+              </DialogTitle>
+              <button
+                onClick={closeImageDialog}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </DialogHeader>
+          <div className="flex justify-center items-center p-4">
+            {selectedImage && (
+              <img
+                src={selectedImage.src}
+                alt={selectedImage.title}
+                className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
