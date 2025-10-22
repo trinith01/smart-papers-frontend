@@ -539,7 +539,7 @@ export default function Register() {
                     </div>  */}
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-gray-700">Followed Teachers (Add multiple)</Label>
+                    <Label className="text-sm font-medium text-gray-700">Teacher</Label>
                     {studentFollowedTeachers.map((ft, idx) => (
                       <div key={idx} className="flex flex-col md:flex-row gap-2 items-center mb-2">
                         <div className="w-full md:w-1/3">
@@ -602,7 +602,7 @@ export default function Register() {
                         <Button type="button" variant="destructive" size="sm" onClick={() => removeFollowedTeacher(idx)} disabled={studentFollowedTeachers.length === 1} className="mt-2 md:mt-0">Remove</Button>
                       </div>
                     ))}
-                    <Button type="button" variant="outline" size="sm" onClick={addFollowedTeacher} className="mt-2">+ Add Institute/Teacher</Button>
+                    {/* <Button type="button" variant="outline" size="sm" onClick={addFollowedTeacher} className="mt-2">+ Add Institute/Teacher</Button> */}
                   </div>
                 </TabsContent>
 

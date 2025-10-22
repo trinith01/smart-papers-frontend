@@ -418,16 +418,35 @@ export default function LeaderBoardPage() {
                           </Badge>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <div className="flex gap-2 justify-center">
+                          <div className="flex gap-3 justify-center items-center">
                             {question.questionIndex?.questionImage && (
-                              <Badge className="bg-purple-100 text-purple-700 border-0 text-xs px-2 py-1">
-                                Question
-                              </Badge>
+                              <div className="relative group">
+                                <img 
+                                  src={question.questionIndex.questionImage}
+                                  alt="Question"
+                                  className="w-12 h-12 object-cover rounded-lg border-2 border-purple-200 cursor-pointer hover:border-purple-400 transition-colors"
+                                  onClick={() => window.open(question.questionIndex.questionImage, '_blank')}
+                                />
+                                <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                  Question Image
+                                </div>
+                              </div>
                             )}
                             {question.questionIndex?.answerReviewImage && (
-                              <Badge className="bg-orange-100 text-orange-700 border-0 text-xs px-2 py-1">
-                                Answer
-                              </Badge>
+                              <div className="relative group">
+                                <img 
+                                  src={question.questionIndex.answerReviewImage}
+                                  alt="Answer Review"
+                                  className="w-12 h-12 object-cover rounded-lg border-2 border-orange-200 cursor-pointer hover:border-orange-400 transition-colors"
+                                  onClick={() => window.open(question.questionIndex.answerReviewImage, '_blank')}
+                                />
+                                <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                  Answer Review
+                                </div>
+                              </div>
+                            )}
+                            {!question.questionIndex?.questionImage && !question.questionIndex?.answerReviewImage && (
+                              <span className="text-slate-400 text-sm">No images</span>
                             )}
                           </div>
                         </td>
