@@ -15,7 +15,7 @@ import PaperAnalysisDashboard from "./pages/Analytics";
 import VideoUploadPage from "./pages/VideoUploadPage";
 import QuestionUploadPage from "./pages/QuestionUploadPage";
 import TeacherUnitManager from "./pages/TeacherUnitManager";
-import LeaderBoardPage from "./pages/LeaderboardPage";
+import LeaderBoardPage from "./pages/LeaderBoardPage";
 
 function App() {
   return (
