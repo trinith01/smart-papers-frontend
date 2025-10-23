@@ -142,7 +142,7 @@ export const GlobalProvider = ({ children }) => {
                 _id: "68b6fe2233dcbc8bb2770f1e",
               },
                {
-                label: "ප්ලේසර්",
+                label: "ලේසර්",
                 value: "ලේසර්",
                 _id: "68b6fe2233dcbc8bb2770f2z",
               },
