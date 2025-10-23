@@ -491,9 +491,7 @@ export default function StudentQuizPage() {
                                 alt={`Question ${questionNumber}`}
                                 className="w-full h-auto max-h-80 object-contain rounded-lg border-2 border-gray-200 shadow-md group-hover:shadow-lg transition-shadow duration-200"
                               />
-                              <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full p-1">
-                                <ImageIcon className="w-4 h-4 text-gray-600" />
-                              </div>
+                              
                             </div>
                           ) : (
                             <div className="w-full h-48 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
