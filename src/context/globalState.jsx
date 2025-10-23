@@ -141,6 +141,11 @@ export const GlobalProvider = ({ children }) => {
                 value: "ප්‍රිස්ම තුලින් වර්තනය",
                 _id: "68b6fe2233dcbc8bb2770f1e",
               },
+               {
+                label: "ප්ලේසර්",
+                value: "ලේසර්",
+                _id: "68b6fe2233dcbc8bb2770f2z",
+              },
               {
                 label: "කාච තුලින් වර්තනය",
                 value: "කාච තුලින් වර්තනය",
@@ -265,6 +270,29 @@ export const GlobalProvider = ({ children }) => {
             ],
             _id: "68b7016533dcbc8bb2770f99",
           },
+          {
+            label: "ක්ෂේත්‍ර",
+            value: "ක්ෂේත්‍ර",
+            subunits: [
+              {
+                label: "චුම්බක ක්ෂේත්‍ර",
+                value: "චුම්බක ක්ෂේත්‍ර",
+                _id: "68b7018f33dcbc8bb2771a01",
+              },
+              {
+                label: "ගුරුත්වාකර්ෂණ ක්ෂේත්‍ර",
+                value: "ගුරුත්වාකර්ෂණ ක්ෂේත්‍ර",
+                _id: "68b7018f33dcbc8bb2771a02",
+              },
+              {
+                label: "විද්‍යුත් ක්ෂේත්‍ර",
+                value: "විද්‍යුත් ක්ෂේත්‍ර",
+                _id: "68b7018f33dcbc8bb2771a03",
+              },
+            ],
+            _id: "68b7018f33dcbc8bb2771a00",
+          },
+
           {
             label: "පදාර්ථයේ ගුණ",
             value: "පදාර්ථයේ ගුණ",
