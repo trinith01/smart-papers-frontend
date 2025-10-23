@@ -293,6 +293,18 @@ export default function Register() {
             errorMsg = `Error: ${error.message}`
           }
         }
+
+        if (!error?.code) {
+          // non-Firebase errors. rollback user creation
+          try {
+            const user = auth.currentUser
+            if (user) {
+              await user.delete()
+            }
+          } catch {
+            errorMsg = "Account creation failed failed. Please contact support."
+          }
+        }
         
         setGeneralError(errorMsg)
         toast.error(errorMsg, {
