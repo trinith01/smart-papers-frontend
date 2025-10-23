@@ -28,7 +28,6 @@ export default function StudentQuizPage() {
   const [accessAllowed, setAccessAllowed] = useState(false)
   const [accessMessage, setAccessMessage] = useState("")
   const [quizEndTime, setQuizEndTime] = useState(null)
-  const [quizStartTime, setQuizStartTime] = useState(null)
 
   // Helper: unique localStorage key per quiz
   const getLocalStorageKey = (quizId) => `studentAnswers_${quizId}`
@@ -38,7 +37,6 @@ export default function StudentQuizPage() {
     if (location.state) {
       const startTime = new Date(location.state.startTime).getTime()
       const endTime = new Date(location.state.endTime).getTime()
-      setQuizStartTime(startTime)
       setQuizEndTime(endTime)
       setMockQuiz({
         id: location.state.quizId,
@@ -188,19 +186,76 @@ export default function StudentQuizPage() {
     const submission = {
       paperId: mockQuiz.id,
       studentId: loggedInUser?._id,
+      instituteId: loggedInUser?.instituteId,
       answers: answersArray,
       instituteId: instituteId,
     }
 
     try {
+      // Show initial loading toast
+      const loadingToast = toast.loading("Submitting your quiz...", { duration: Infinity })
+      
       const res = await api.post("/api/submissions", submission)
-      console.log("Quiz submission response:", res.data)
-      if (res.status === 200) {
+      
+      // Dismiss loading toast
+      toast.dismiss(loadingToast)
+      
+      if (res.status === 202) {
+        // Submission queued - start polling for status
+        const { jobId } = res.data
+        toast.success("Quiz submitted! Processing your answers...", { duration: 3000 })
+        
+        // Poll for submission status
+        pollSubmissionStatus(jobId)
+      } else if (res.status === 200 || res.status === 201) {
+        // Legacy sync response (fallback)
         toast.success("Quiz Submitted: Your answers have been submitted successfully!")
       }
     } catch (err) {
+      console.error("Failed to submit quiz:", err)
       toast.error("Failed to submit quiz. Please try again.")
+      setIsQuizCompleted(false) // Allow retry
     }
+  }
+
+  // Poll submission status
+  const pollSubmissionStatus = async (jobId, maxAttempts = 60, intervalMs = 2000) => {
+    let attempts = 0
+    
+    const poll = async () => {
+      if (attempts >= maxAttempts) {
+        toast.warning("Processing is taking longer than expected. Your submission is queued and will be processed shortly.")
+        return
+      }
+      
+      try {
+        const res = await api.get(`/api/submissions/status/${jobId}`)
+        const { status, result, error } = res.data
+        
+        if (status === "completed") {
+          toast.success(`Quiz processed! Score: ${result.score}/${result.total}`, { duration: 5000 })
+          // Optionally refresh data or redirect
+        } else if (status === "failed") {
+          toast.error(`Submission failed: ${error || "Unknown error"}`)
+          setIsQuizCompleted(false) // Allow retry
+        } else if (status === "processing" || status === "queued") {
+          // Continue polling
+          attempts++
+          setTimeout(poll, intervalMs)
+        }
+      } catch (err) {
+        console.error("Error polling submission status:", err)
+        attempts++
+        if (attempts < maxAttempts) {
+          setTimeout(poll, intervalMs)
+        } else {
+          toast.warning("Unable to check submission status. Your answers have been queued for processing.")
+        }
+      }
+    }
+    
+    // Start polling after a short delay
+    setTimeout(poll, intervalMs)
   }
 
   // Update startQuiz to set timer to remaining time
