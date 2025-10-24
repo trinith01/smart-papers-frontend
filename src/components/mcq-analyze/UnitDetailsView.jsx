@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { ArrowLeft, CheckCircle, XCircle, AlertTriangle, Target, Eye } from "lucide-react"
+import { getImageUrl } from "@/lib/utils"
 
 const answerOptions = ["1", "2", "3", "4", "5"]
 
@@ -160,7 +161,7 @@ export default function UnitDetailsView({
                           <div className="w-full max-w-[600px] mx-auto bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl flex items-center justify-center border border-gray-200/50 shadow-inner p-4">
                             <img
                               src={
-                                question.questionImage || "/placeholder.svg"
+                                getImageUrl(question.questionImage) || "/placeholder.svg"
                               }
                               alt={`ප්‍රශ්න ${question.questionId}`}
                               className="w-full h-auto max-h-[500px] object-contain rounded-lg"
@@ -243,7 +244,7 @@ export default function UnitDetailsView({
                     <div className="w-full h-auto max-h-[60vh] object-contain rounded-lg">
                       <img
                         src={
-                          selectedQuestion.questionImage || "/placeholder.svg"
+                          getImageUrl(selectedQuestion.questionImage) || "/placeholder.svg"
                         }
                         alt={`ප්‍රශ්න ${selectedQuestion.questionId}`}
                         className="max-w-full max-h-full object-contain rounded-lg"
@@ -288,7 +289,7 @@ export default function UnitDetailsView({
                     <div className="aspect-video bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl flex items-center justify-center border border-gray-200/50 shadow-inner">
                       <img
                         src={
-                          selectedQuestion.answerReviewImage ||
+                          getImageUrl(selectedQuestion.answerReviewImage) ||
                           "/placeholder.svg"
                         }
                         alt={`ප්‍රශ්න ${selectedQuestion.questionId} සඳහා විසඳුම`}

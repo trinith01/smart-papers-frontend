@@ -159,13 +159,8 @@ export default function StudentQuizPage() {
       return // Don't submit if questions are unanswered and it's not a timeout
     }
 
-    setIsQuizCompleted(true)
+    // Close confirmation dialog immediately
     setShowConfirmDialog(false)
-
-    // Clear localStorage after submission
-    if (mockQuiz.id) {
-      localStorage.removeItem(getLocalStorageKey(mockQuiz.id))
-    }
 
     // Map answers - for timeout, use default answer 0 for unanswered questions
     const answersArray = mockQuiz.questions.map((q) => {
@@ -203,18 +198,32 @@ export default function StudentQuizPage() {
       if (res.status === 202) {
         // Submission queued - start polling for status
         const { jobId } = res.data
+        setIsQuizCompleted(true)
+        
+        // Clear localStorage after successful submission
+        if (mockQuiz.id) {
+          localStorage.removeItem(getLocalStorageKey(mockQuiz.id))
+        }
+        
         toast.success("Quiz submitted! Processing your answers...", { duration: 3000 })
         
         // Poll for submission status
         pollSubmissionStatus(jobId)
       } else if (res.status === 200 || res.status === 201) {
         // Legacy sync response (fallback)
+        setIsQuizCompleted(true)
+        
+        // Clear localStorage after successful submission
+        if (mockQuiz.id) {
+          localStorage.removeItem(getLocalStorageKey(mockQuiz.id))
+        }
+        
         toast.success("Quiz Submitted: Your answers have been submitted successfully!")
       }
     } catch (err) {
       console.error("Failed to submit quiz:", err)
       toast.error("Failed to submit quiz. Please try again.")
-      setIsQuizCompleted(false) // Allow retry
+      // Don't set quiz as completed if submission failed - user can retry
     }
   }
 
