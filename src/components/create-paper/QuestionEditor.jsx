@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
-import { FileText, Trash2, Save, ImageIcon } from "lucide-react"
+import { FileText, Trash2, Save, ImageIcon, CheckCircle } from "lucide-react"
 import { getImageUrl } from "@/lib/utils"
 
 export default function QuestionEditor({
@@ -19,7 +19,8 @@ export default function QuestionEditor({
   units,
   setQuestions,
   handleSubmit,
-  isSubmitting
+  isSubmitting,
+  onClearAll
 }) {
   return (
     <Card>
@@ -28,8 +29,12 @@ export default function QuestionEditor({
           <FileText className="h-5 w-5" />
           Questions ({questions.length})
         </CardTitle>
-        <CardDescription>
-          Create your multiple choice questions with 5 options each
+        <CardDescription className="flex items-center justify-between">
+          <span>Create your multiple choice questions with 5 options each</span>
+          <Badge variant="secondary" className="flex items-center gap-1">
+            <CheckCircle className="h-3 w-3" />
+            Auto-saving enabled
+          </Badge>
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -285,11 +290,11 @@ export default function QuestionEditor({
         <div className="flex justify-end space-x-4">
           <Button
             variant="outline"
-            onClick={() => setQuestions([])}
+            onClick={onClearAll || (() => setQuestions([]))}
             disabled={isSubmitting}
           >
             <Trash2 className="h-4 w-4 mr-2" />
-            Clear All
+            Clear All & Draft
           </Button>
           <Button onClick={handleSubmit} disabled={isSubmitting}>
             {isSubmitting ? (

@@ -1,10 +1,11 @@
 "use client";
 
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useCallback, useRef } from "react";
 import { toast } from "sonner";
 import api, { uploadImage } from "@/services/api";
 import { z } from "zod";
 import { GlobalContext } from "@/context/globalState";
+import { usePaperDraft } from "@/hooks/usePaperDraft";
 
 import PageHeader from "@/components/create-paper/PageHeader";
 import PaperConfiguration from "@/components/create-paper/PaperConfiguration";
@@ -12,6 +13,7 @@ import AvailabilitySlots from "@/components/create-paper/AvailabilitySlots";
 import QuestionEditor from "@/components/create-paper/QuestionEditor";
 import PastPapersTable from "@/components/create-paper/PastPapersTable";
 import PreviewDialog from "@/components/create-paper/PreviewDialog";
+import DraftRestoreDialog from "@/components/create-paper/DraftRestoreDialog";
 
 const QuestionSchema = z.object({
   questionImage: z.string().min(1, "Question image is required"),
@@ -61,7 +63,22 @@ export default function CreateMCQPage() {
   const [availability, setAvailability] = useState([]);
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
- 
+  
+  // Draft restoration dialog state
+  const [showDraftDialog, setShowDraftDialog] = useState(false);
+  const [draftInfo, setDraftInfo] = useState(null);
+  
+  // Use the paper draft hook with save callback
+  const { hasDraft, saveDraft, loadDraft, clearDraft, getDraftInfo } = usePaperDraft(() => {
+    // Show a subtle indication that draft was saved
+    const toastId = toast.loading("Saving draft...", { duration: 500 });
+    setTimeout(() => {
+      toast.dismiss(toastId);
+    }, 500);
+  });
+  
+  // Ref to prevent auto-save during initial load
+  const isInitialLoad = useRef(true);
 
   const { units } = useContext(GlobalContext);
 
@@ -99,6 +116,88 @@ export default function CreateMCQPage() {
 
     fetchData();
   }, []);
+
+  // Check for draft on component mount
+  useEffect(() => {
+    if (hasDraft) {
+      const info = getDraftInfo();
+      if (info) {
+        setDraftInfo(info);
+        setShowDraftDialog(true);
+      }
+    }
+  }, [hasDraft, getDraftInfo]);
+
+  // Auto-save functionality
+  const autoSave = useCallback(() => {
+    if (isInitialLoad.current) return;
+    
+    // Only save if there's meaningful content
+    if (paperTitle.trim() || questions.length > 0 || availability.length > 0) {
+      const draftData = {
+        paperTitle,
+        subject,
+        paperCategory,
+        year,
+        questionCount,
+        questions,
+        availability,
+      };
+      saveDraft(draftData);
+    }
+  }, [paperTitle, subject, paperCategory, year, questionCount, questions, availability, saveDraft]);
+
+  // Auto-save when state changes
+  useEffect(() => {
+    if (!isInitialLoad.current) {
+      const timeoutId = setTimeout(autoSave, 1000); // Debounce saves by 1 second
+      return () => clearTimeout(timeoutId);
+    }
+  }, [autoSave]);
+
+  // Mark initial load as complete
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      isInitialLoad.current = false;
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Handle draft restoration
+  const handleRestoreDraft = () => {
+    const draft = loadDraft();
+    if (draft) {
+      setPaperTitle(draft.paperTitle || "");
+      setSubject(draft.subject || "");
+      setPaperCategory(draft.paperCategory || "theory");
+      setYear(draft.year || new Date().getFullYear().toString());
+      setQuestionCount(draft.questionCount || 15);
+      setQuestions(draft.questions || []);
+      setAvailability(draft.availability || []);
+      
+      setShowDraftDialog(false);
+      toast.success("Draft restored successfully");
+    }
+  };
+
+  // Handle draft discard
+  const handleDiscardDraft = () => {
+    clearDraft();
+    setShowDraftDialog(false);
+    toast.success("Draft discarded");
+  };
+
+  // Handle clearing all data including draft
+  const handleClearAll = () => {
+    setQuestions([]);
+    setPaperTitle("");
+    setSubject("");
+    setPaperCategory("theory");
+    setYear(new Date().getFullYear().toString());
+    setAvailability([]);
+    clearDraft();
+    toast.success("All data and draft cleared");
+  };
 
   const initializeQuestions = (count) => {
     const newQuestions = Array.from({ length: count }, (_, index) => ({
@@ -276,6 +375,10 @@ export default function CreateMCQPage() {
       const res = await api.post("/api/papers", paperObject);
       if (res.status === 201) {
         toast.success(res.data.message);
+        
+        // Clear the saved draft since paper was successfully submitted
+        clearDraft();
+        
         // Reset form
         setPaperTitle("");
         setSubject("");
@@ -342,6 +445,7 @@ export default function CreateMCQPage() {
           setQuestions={setQuestions}
           handleSubmit={handleSubmit}
           isSubmitting={isSubmitting}
+          onClearAll={handleClearAll}
         />
       )}
 
@@ -354,6 +458,14 @@ export default function CreateMCQPage() {
         isPreviewOpen={isPreviewOpen}
         setIsPreviewOpen={setIsPreviewOpen}
         selectedPaper={selectedPaper}
+      />
+
+      <DraftRestoreDialog
+        isOpen={showDraftDialog}
+        onClose={() => setShowDraftDialog(false)}
+        draftInfo={draftInfo}
+        onRestore={handleRestoreDraft}
+        onDiscard={handleDiscardDraft}
       />
     </div>
   );
