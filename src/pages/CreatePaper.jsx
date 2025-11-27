@@ -57,6 +57,7 @@ export default function CreateMCQPage() {
   const [questionCount, setQuestionCount] = useState(15);
   const [questions, setQuestions] = useState([]);
   const [pastPapers, setPastPapers] = useState([]);
+  const [isPaid, setIsPaid] = useState(false);
   const [selectedPaper, setSelectedPaper] = useState(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [institutes, setInstitutes] = useState([]);
@@ -142,10 +143,11 @@ export default function CreateMCQPage() {
         questionCount,
         questions,
         availability,
+        isPaid,
       };
       saveDraft(draftData);
     }
-  }, [paperTitle, subject, paperCategory, year, questionCount, questions, availability, saveDraft]);
+  }, [paperTitle, subject, paperCategory, year, questionCount, questions, availability, isPaid, saveDraft]);
 
   // Auto-save when state changes
   useEffect(() => {
@@ -174,6 +176,7 @@ export default function CreateMCQPage() {
       setQuestionCount(draft.questionCount || 15);
       setQuestions(draft.questions || []);
       setAvailability(draft.availability || []);
+      setIsPaid(draft.isPaid || false);
       
       setShowDraftDialog(false);
       toast.success("Draft restored successfully");
@@ -195,6 +198,7 @@ export default function CreateMCQPage() {
     setPaperCategory("theory");
     setYear(new Date().getFullYear().toString());
     setAvailability([]);
+    setIsPaid(false);
     clearDraft();
     toast.success("All data and draft cleared");
   };
@@ -365,6 +369,7 @@ export default function CreateMCQPage() {
         })),
         year: year,
         category: paperCategory,
+        is_paid: isPaid,
         availability: availability.map((slot) => ({
           institute: slot.institute,
           startTime: new Date(slot.startTime),
@@ -386,6 +391,7 @@ export default function CreateMCQPage() {
         setYear(currentYear.toString());
         setQuestions([]);
         setAvailability([]);
+        setIsPaid(false);
 
         const papersRes = await api.get("/api/papers");
         if (papersRes.status === 200) {
@@ -425,6 +431,8 @@ export default function CreateMCQPage() {
         isSubmitting={isSubmitting}
         minYear={minYear}
         maxYear={maxYear}
+        isPaid={isPaid}
+        setIsPaid={setIsPaid}
       />
 
       <AvailabilitySlots

@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Plus } from "lucide-react"
 
 export default function PaperConfiguration({
@@ -22,7 +23,9 @@ export default function PaperConfiguration({
   initializeQuestions,
   isSubmitting,
   minYear,
-  maxYear
+  maxYear,
+  isPaid,
+  setIsPaid
 }) {
   const subjectOptions = [{ value: "Physics", label: "Physics" }]
 
@@ -102,6 +105,21 @@ export default function PaperConfiguration({
               Year must be between {minYear} and {maxYear}
             </p>
           </div>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="isPaid"
+            checked={isPaid}
+            onCheckedChange={setIsPaid}
+            disabled={isSubmitting}
+          />
+          <Label
+            htmlFor="isPaid"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            This is a paid paper
+          </Label>
         </div>
 
         <div className="space-y-2">

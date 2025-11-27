@@ -26,6 +26,7 @@ export default function PastPapersTable({ pastPapers, handlePreview }) {
               <TableHead>Year</TableHead>
               <TableHead>Questions</TableHead>
               <TableHead>Institutes</TableHead>
+              <TableHead>Type</TableHead>
               <TableHead>Created Date</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
@@ -43,6 +44,13 @@ export default function PastPapersTable({ pastPapers, handlePreview }) {
                 <TableCell>{paper.year}</TableCell>
                 <TableCell>{paper.questions?.length || 0}</TableCell>
                 <TableCell>{paper.availability?.length || 0}</TableCell>
+                <TableCell>
+                  {paper.is_paid ? (
+                    <Badge variant="default" className="bg-yellow-600">Paid</Badge>
+                  ) : (
+                    <Badge variant="secondary">Free</Badge>
+                  )}
+                </TableCell>
                 <TableCell>
                   {new Date(paper.createdAt).toLocaleDateString()}
                 </TableCell>
