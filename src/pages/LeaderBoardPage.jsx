@@ -186,8 +186,11 @@ export default function LeaderBoardPage() {
               <CardTitle className="text-2xl font-bold text-slate-800">
                 Leaderboard Processing
               </CardTitle>
-              <CardDescription className="text-base text-slate-600">
-                {paperInfo.paper?.title}
+              <CardDescription className="text-base text-slate-600 space-y-2">
+                <div>{paperInfo.paper?.title}</div>
+                {paperInfo.paper?.is_paid && (
+                  <Badge variant="default" className="bg-yellow-600">Paid Paper</Badge>
+                )}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 text-center">
@@ -310,6 +313,11 @@ export default function LeaderBoardPage() {
                     <Users className="h-5 w-5" />
                     <span className="font-medium">{overallLeaderboard.length} Participants</span>
                   </div>
+                  {paper.is_paid && (
+                    <div className="flex items-center gap-2 bg-yellow-400/20 px-4 py-2 rounded-full backdrop-blur-sm border border-yellow-400/30">
+                      <span className="font-medium">Paid Paper</span>
+                    </div>
+                  )}
                 </div>
               </div>
               <Badge className="bg-yellow-400 text-yellow-900 px-6 py-3 text-lg font-bold border-0 hover:bg-yellow-300">

@@ -233,6 +233,11 @@ export default function AvailableQuizzes({
                 Completed
               </Badge>
             )}
+            {quiz.is_paid && (
+              <Badge variant="default" className="bg-yellow-600 text-white text-xs">
+                Paid
+              </Badge>
+            )}
           </div>
         </CardHeader>
         <CardContent className="space-y-4">

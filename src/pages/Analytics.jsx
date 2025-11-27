@@ -158,6 +158,9 @@ export default function PaperAnalysisDashboard() {
                       </div>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="font-semibold">{paper.subject}</span>
+                        {paper.is_paid && (
+                          <Badge variant="default" className="bg-yellow-600 text-xs">Paid</Badge>
+                        )}
                       </div>
                       <div className="text-xs mt-1 text-muted-foreground">
                         {avail?.institute?.name || "Institute"}
@@ -237,6 +240,9 @@ export default function PaperAnalysisDashboard() {
                     <div className="flex items-center gap-2">
                       <Calendar className="h-3 w-3" />
                       <span>{paper.year}</span>
+                      {paper.is_paid && (
+                        <Badge variant="default" className="bg-yellow-600 text-xs ml-1">👑</Badge>
+                      )}
                     </div>
                     <div className="text-xs font-medium">{paper.subject}</div>
                   </CardDescription>

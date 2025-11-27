@@ -24,7 +24,7 @@ export default function PreviewDialog({
         <ScrollArea className="h-[60vh] pr-4">
           {selectedPaper && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-muted rounded-lg">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-4 bg-muted rounded-lg">
                 <div>
                   <Label className="text-sm font-medium">
                     Total Questions
@@ -49,6 +49,12 @@ export default function PreviewDialog({
                   <Label className="text-sm font-medium">Institutes</Label>
                   <p className="text-lg font-semibold">
                     {selectedPaper.availability?.length || 0}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Type</Label>
+                  <p className="text-lg font-semibold">
+                    {selectedPaper.is_paid ? "Paid" : "Free"}
                   </p>
                 </div>
               </div>
