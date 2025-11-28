@@ -118,7 +118,7 @@ export default function StudentResultsPage() {
       console.log("Fetching available quizzes for teacherId:", teacherId, "instituteId:", instituteId, "category:", selectedCategory, "year:", loggedInUser.year)
 
       const res = await api.get(
-        `/api/papers/available?teacherId=${teacherId}&category=${selectedCategory}&year=${loggedInUser.year}&instituteId=${instituteId}`,
+        `/api/papers/available?teacherId=${teacherId}&category=${selectedCategory}&year=${loggedInUser.year}&instituteId=${instituteId}&studentId=${loggedInUser._id}`,
       )
 
       if (res.status === 200) {
