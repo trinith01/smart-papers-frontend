@@ -4,6 +4,9 @@ import { useEffect, useState } from "react"
 import api from "@/services/api"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { AlertCircle } from "lucide-react"
+import { Link } from "react-router-dom"
 import MarksComparisonChart from "@/components/marks-comparison"
 import LoadingState from "@/components/student-performance/LoadingState"
 import PageHeader from "@/components/student-performance/PageHeader"
@@ -210,6 +213,20 @@ export default function StudentResultsPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50">
       <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-8">
         <PageHeader />
+
+        {/* Barcode Notice */}
+        {!loggedInUser.barcode && (
+          <Alert className="border-amber-200 bg-amber-50">
+            <AlertCircle className="h-4 w-4 text-amber-600" />
+            <AlertDescription className="text-amber-800">
+              <span className="font-medium">Barcode not set!</span> Please{" "}
+              <Link to="/profile-setting" className="underline font-semibold hover:text-amber-900">
+                update your profile
+              </Link>{" "}
+              to add your barcode for eligibility checks.
+            </AlertDescription>
+          </Alert>
+        )}
 
         <TeacherCategorySelector 
           preferredTeacher={getPreferredFollowedTeacher()}
