@@ -20,6 +20,7 @@ export default function ProfileInformation({ student, updateStudent }) {
   const [formData, setFormData] = useState({
     name: student?.name || "",
     year: student?.year || "",
+    barcode: student?.barcode || "",
   })
 
   // Handle preferred followed teacher change
@@ -47,6 +48,7 @@ export default function ProfileInformation({ student, updateStudent }) {
     const updatedProfile = {
       name: formData.name,
       year: formData.year,
+      barcode: formData.barcode,
       preferredFollowedTeacher: student.preferredFollowedTeacher, // this is a number (index)
     }
 
@@ -66,6 +68,7 @@ export default function ProfileInformation({ student, updateStudent }) {
     setFormData({
       name: student.name || "",
       year: student.year || "",
+      barcode: student.barcode || "",
     })
     setIsEditing(false)
   }
@@ -161,6 +164,26 @@ export default function ProfileInformation({ student, updateStudent }) {
               <div className="p-3 bg-slate-50/50 rounded-lg border border-slate-200 h-12 flex items-center text-slate-500">
                 {student.uuid} (Read-only)
               </div>
+            </div>
+            <div className="space-y-3">
+              <Label htmlFor="barcode" className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                <Badge className="h-4 w-4" />
+                Barcode
+              </Label>
+              {isEditing ? (
+                <Input
+                  id="barcode"
+                  value={formData.barcode}
+                  onChange={(e) => setFormData({ ...formData, barcode: e.target.value })}
+                  placeholder="Enter your barcode"
+                  className="h-12 bg-white border-slate-200 focus:border-primary focus:ring-primary/20"
+                  disabled={!isEditing}
+                />
+              ) : (
+                <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 h-12 flex items-center text-slate-900">
+                  {student.barcode || "Not set"}
+                </div>
+              )}
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 pt-4">
